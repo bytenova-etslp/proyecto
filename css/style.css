@@ -651,3 +651,10 @@ footer {
 		text-align: center;
 	}
 }
+
+/* Mensaje usado por la validacion de los formularios de acceso y registro */
+.mensaje-formulario {
+    margin-top: 12px;
+    text-align: center;
+    min-height: 20px;
+}
