@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Punto Moda - Inicio</title>
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="shortcut icon" type="image/png" href="imagenes/favicon.png">
+</head>
+<body>
+
+	<!--
+		Archivo: index.html
+		Proyecto: PuntoModa - ByteNova
+		Ultima actualizacion: 04/09/2026
+	-->
+
+	<!-- Encabezado y navegacion principal -->
+	<header>
+		<nav class="barra-navegacion">
+			<a href="index.html" class="logo">Punto<span>Moda</span></a>
+			<ul class="enlaces-navegacion">
+				<li><a href="index.html" class="activo">Inicio</a></li>
+				<li><a href="productos.html">Productos</a></li>
+				<li><a href="carrito.html">Carrito <span id="contador-carrito" class="contador-carrito">0</span></a></li>
+				<li><a href="login.html">Ingresar</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	<main>
+		<!-- Presentacion principal del sitio -->
+		<section class="presentacion">
+			<h1>Bienvenidos a Punto Moda</h1>
+			<p>La revolución del e-commerce de indumentaria. Diseños exclusivos y calidad garantizada.</p>
+			<a href="productos.html" class="btn">Ver Catálogo</a>
+		</section>
+
+		<!-- Producto destacado -->
+		<section>
+			<h2 class="titulo-seccion">Producto Destacado</h2>
+			<div class="cuadricula-productos">
+				<div class="tarjeta-producto">
+					<a href="detalle-producto.html" class="enlace-imagen-producto">
+						<div class="imagen-producto">
+							<img src="imagenes/canguro.jpg" alt="Canguro Oversize">
+						</div>
+					</a>
+					<div class="info-producto">
+						<div class="categoria-producto">Abrigos</div>
+						<h3 class="titulo-producto">Canguro Oversize</h3>
+						<div class="precio-producto">$ 1.890</div>
+						<div class="botones-producto">
+							<a href="detalle-producto.html" class="btn btn-secundario">Ver detalle</a>
+							<button type="button" class="btn btn-agregar-producto" data-id="1">Agregar al Carrito</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<!-- Mensaje que JavaScript muestra al agregar un producto -->
+	<div id="mensaje-flotante" class="mensaje-flotante"></div>
+
+	<footer>
+		<p>&copy; Diseñado por ByteNova 2026</p>
+	</footer>
+
+	<!-- storage.js se carga primero porque catalogo.js usa sus funciones -->
+	<script src="js/storage.js"></script>
+	<script src="js/catalogo.js"></script>
+</body>
+</html>

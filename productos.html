@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Punto Moda - Productos</title>
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="shortcut icon" type="image/png" href="imagenes/favicon.png">
+</head>
+<body>
+
+	<!--
+		Archivo: productos.html
+		Proyecto: PuntoModa - ByteNova
+		Ultima actualizacion: 04/09/2026
+	-->
+
+	<!-- Encabezado y navegacion principal -->
+	<header>
+		<nav class="barra-navegacion">
+			<a href="index.html" class="logo">Punto<span>Moda</span></a>
+			<ul class="enlaces-navegacion">
+				<li><a href="index.html">Inicio</a></li>
+				<li><a href="productos.html" class="activo">Productos</a></li>
+				<li><a href="carrito.html">Carrito <span id="contador-carrito" class="contador-carrito">0</span></a></li>
+				<li><a href="login.html">Ingresar</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	<main>
+		<section>
+			<h2 class="titulo-seccion">Nuestro Catálogo</h2>
+			<p class="texto-introductorio">Explorá nuestras prendas exclusivas.</p>
+
+			<!-- JavaScript inserta aca las tarjetas de productos -->
+			<div id="catalogo-container" class="cuadricula-productos"></div>
+		</section>
+	</main>
+
+	<!-- Mensaje que JavaScript muestra al agregar un producto -->
+	<div id="mensaje-flotante" class="mensaje-flotante"></div>
+
+	<footer>
+		<p>&copy; Diseñado por ByteNova 2026</p>
+	</footer>
+
+	<!-- storage.js se carga primero porque catalogo.js usa sus funciones -->
+	<script src="js/storage.js"></script>
+	<script src="js/catalogo.js"></script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Punto Moda - Carrito</title>
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="shortcut icon" type="image/png" href="imagenes/favicon.png">
+</head>
+<body>
+
+	<!--
+		Archivo: carrito.html
+		Proyecto: PuntoModa - ByteNova
+		Ultima actualizacion: 04/09/2026
+		Carrito adaptado a partir del ejemplo entregado en clase.
+	-->
+
+	<!-- Encabezado y navegacion principal -->
+	<header>
+		<nav class="barra-navegacion">
+			<a href="index.html" class="logo">Punto<span>Moda</span></a>
+			<ul class="enlaces-navegacion">
+				<li><a href="index.html">Inicio</a></li>
+				<li><a href="productos.html">Productos</a></li>
+				<li><a href="carrito.html" class="activo">Carrito <span id="contador-carrito" class="contador-carrito">0</span></a></li>
+				<li><a href="login.html">Ingresar</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	<main>
+		<section class="contenedor-carrito">
+			<h2 class="titulo-seccion">Tu Carrito</h2>
+
+			<!-- Se muestra solamente cuando no hay productos guardados -->
+			<p id="carrito-vacio" class="carrito-vacio">
+				Tu carrito está vacío. Agregá productos desde el catálogo.
+			</p>
+
+			<!-- JavaScript inserta aca los productos guardados -->
+			<div id="carrito-container" class="carrito-lista"></div>
+
+			<!-- Resumen del carrito y acciones principales -->
+			<div class="carrito-resumen">
+				<h3 id="total-carrito" class="total-carrito">Total: $0</h3>
+				<div class="carrito-acciones">
+					<button id="btn-vaciar" class="btn btn-secundario">Vaciar carrito</button>
+					<button id="btn-finalizar" class="btn">Finalizar compra</button>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<footer>
+		<p>&copy; Diseñado por ByteNova 2026</p>
+	</footer>
+
+	<!-- storage.js va primero: carrito.js depende de sus funciones -->
+	<script src="js/storage.js"></script>
+	<script src="js/carrito.js"></script>
+</body>
+</html>
