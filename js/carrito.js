@@ -38,10 +38,11 @@ function mostrarCarrito() {
 		const div = document.createElement("div");
 		div.classList.add("item-carrito");
 
-		// 2) Agregar su informacion y botones.
+		// 2) Agregar su informacion, talle y botones.
 		div.innerHTML = `
 			<div class="item-info">
 				<span class="item-nombre">${item.nombre}</span>
+				<span class="item-talle">Talle: ${item.talle || "Sin especificar"}</span>
 				<span class="item-precio-unitario">$${item.precio.toLocaleString("es-UY")} c/u</span>
 			</div>
 
@@ -55,10 +56,10 @@ function mostrarCarrito() {
 			<button class="btn-eliminar" aria-label="Eliminar producto">✕</button>
 		`;
 
-		// Cada boton modifica solamente este producto, identificado por su id.
-		div.querySelector(".btn-sumar").addEventListener("click", () => cambiarCantidad(item.id, 1));
-		div.querySelector(".btn-restar").addEventListener("click", () => cambiarCantidad(item.id, -1));
-		div.querySelector(".btn-eliminar").addEventListener("click", () => eliminarDelCarrito(item.id));
+		// Cada boton modifica solamente este producto y talle.
+		div.querySelector(".btn-sumar").addEventListener("click", () => cambiarCantidad(item.id, item.talle, 1));
+		div.querySelector(".btn-restar").addEventListener("click", () => cambiarCantidad(item.id, item.talle, -1));
+		div.querySelector(".btn-eliminar").addEventListener("click", () => eliminarDelCarrito(item.id, item.talle));
 
 		// 3) Agregar el producto a la pagina.
 		contenedor.appendChild(div);
@@ -68,10 +69,10 @@ function mostrarCarrito() {
 	actualizarContadorCarrito();
 }
 
-// Suma o resta una unidad a la cantidad de un producto.
-function cambiarCantidad(id, cambio) {
+// Suma o resta una unidad a la cantidad de un producto y talle.
+function cambiarCantidad(id, talle, cambio) {
 	let carrito = cargarCarrito();
-	const item = carrito.find(producto => producto.id === id);
+	const item = carrito.find(producto => producto.id === id && producto.talle === talle);
 
 	if (!item) return;
 
@@ -79,16 +80,16 @@ function cambiarCantidad(id, cambio) {
 
 	// Si la cantidad llega a cero, el producto se elimina.
 	if (item.cantidad <= 0) {
-		carrito = carrito.filter(producto => producto.id !== id);
+		carrito = carrito.filter(producto => !(producto.id === id && producto.talle === talle));
 	}
 
 	guardarCarrito(carrito);
 	mostrarCarrito();
 }
 
-// Elimina por completo un producto del carrito.
-function eliminarDelCarrito(id) {
-	const carrito = cargarCarrito().filter(producto => producto.id !== id);
+// Elimina por completo un producto de un talle determinado.
+function eliminarDelCarrito(id, talle) {
+	const carrito = cargarCarrito().filter(producto => !(producto.id === id && producto.talle === talle));
 	guardarCarrito(carrito);
 	mostrarCarrito();
 }

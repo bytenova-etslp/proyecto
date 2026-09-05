@@ -15,7 +15,8 @@ const productos = [
 		nombre: "Canguro Oversize",
 		precio: 1890,
 		categoria: "Abrigos",
-		imagen: "imagenes/canguro.jpg"
+		imagen: "imagenes/canguro.jpg",
+		talles: ["S", "M", "L", "XL"]
 	}
 ];
 
@@ -29,6 +30,12 @@ function mostrarProductos() {
 	contenedor.innerHTML = "";
 
 	productos.forEach(producto => {
+		// Preparamos las opciones de talle para el selector.
+		let opcionesTalle = "";
+		producto.talles.forEach(talle => {
+			opcionesTalle += `<option value="${talle}">${talle}</option>`;
+		});
+
 		// 1) Crear el elemento de la tarjeta.
 		const card = document.createElement("div");
 		card.classList.add("tarjeta-producto");
@@ -44,6 +51,12 @@ function mostrarProductos() {
 				<div class="categoria-producto">${producto.categoria}</div>
 				<h3 class="titulo-producto">${producto.nombre}</h3>
 				<div class="precio-producto">$ ${producto.precio.toLocaleString("es-UY")}</div>
+				<div class="seleccion-talle">
+					<label for="talle-${producto.id}">Talle</label>
+					<select id="talle-${producto.id}" class="selector-talle" data-producto-id="${producto.id}">
+						${opcionesTalle}
+					</select>
+				</div>
 				<div class="botones-producto">
 					<a href="detalle-producto.html" class="btn btn-secundario">Ver detalle</a>
 					<button type="button" class="btn btn-agregar-producto" data-id="${producto.id}">Agregar al Carrito</button>
@@ -56,10 +69,10 @@ function mostrarProductos() {
 	});
 }
 
-// Agrega un producto o suma uno a la cantidad si ya estaba guardado.
-function agregarAlCarrito(producto) {
+// Agrega un producto o suma uno a la cantidad si ya estaba guardado con el mismo talle.
+function agregarAlCarrito(producto, talle) {
 	const carrito = cargarCarrito();
-	const existente = carrito.find(item => item.id === producto.id);
+	const existente = carrito.find(item => item.id === producto.id && item.talle === talle);
 
 	if (existente) {
 		existente.cantidad++;
@@ -68,16 +81,17 @@ function agregarAlCarrito(producto) {
 			id: producto.id,
 			nombre: producto.nombre,
 			precio: producto.precio,
+			talle: talle,
 			cantidad: 1
 		});
 	}
 
 	guardarCarrito(carrito);
 	actualizarContadorCarrito();
-	mostrarMensaje(`${producto.nombre} agregado al carrito`);
+	mostrarMensaje(`${producto.nombre} talle ${talle} agregado al carrito`);
 }
 
-// Conecta los botones de agregar con el producto correspondiente.
+// Conecta los botones de agregar con el producto y el talle seleccionados.
 function prepararBotonesAgregar() {
 	const botones = document.querySelectorAll(".btn-agregar-producto");
 
@@ -85,9 +99,10 @@ function prepararBotonesAgregar() {
 		boton.addEventListener("click", () => {
 			const id = Number(boton.dataset.id);
 			const producto = productos.find(item => item.id === id);
+			const selectorTalle = document.querySelector(`.selector-talle[data-producto-id="${id}"]`);
 
-			if (producto) {
-				agregarAlCarrito(producto);
+			if (producto && selectorTalle) {
+				agregarAlCarrito(producto, selectorTalle.value);
 			}
 		});
 	});

@@ -658,3 +658,35 @@ footer {
     text-align: center;
     min-height: 20px;
 }
+
+/* Selector de talle usado en el catalogo y en el detalle del producto */
+.seleccion-talle {
+	margin-bottom: 15px;
+}
+
+.seleccion-talle label {
+	display: block;
+	font-size: 14px;
+	font-weight: 600;
+	color: #444;
+	margin-bottom: 6px;
+}
+
+.selector-talle {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	background-color: #fff;
+	font-size: 14px;
+}
+
+.selector-talle:focus {
+	border-color: #e94560;
+	outline: none;
+}
+
+.item-talle {
+	font-size: 13px;
+	color: #555;
+}
