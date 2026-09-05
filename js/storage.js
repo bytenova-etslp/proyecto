@@ -1,6 +1,6 @@
 /*
 	Archivo: storage.js
-	Proyecto: PuntoModa - ByteNova
+	Proyecto: Punto Moda - ByteNova
 	Ultima actualizacion: 04/09/2026
 
 	Este archivo se basa en el ejemplo de carrito entregado en clase.

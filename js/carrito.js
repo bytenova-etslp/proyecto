@@ -1,6 +1,6 @@
 /*
 	Archivo: carrito.js
-	Proyecto: PuntoModa - ByteNova
+	Proyecto: Punto Moda - ByteNova
 	Ultima actualizacion: 04/09/2026
 
 	Adaptado del ejemplo de carrito entregado en clase.
