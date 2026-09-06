@@ -100,13 +100,13 @@ function vaciarCarrito() {
 	mostrarCarrito();
 }
 
-// Por ahora la compra es simulada, ya que todavia no se esta usando PHP.
+// Por ahora la compra es simulada y el pedido no se guarda en la base de datos.
 function finalizarCompra() {
 	const carrito = cargarCarrito();
 
 	if (carrito.length === 0) return;
 
-	alert("Compra simulada. La conexión con el servidor se agregará más adelante.");
+	alert("Compra simulada. El pedido todavía no se guarda en la base de datos.");
 	vaciarCarrito();
 }
 

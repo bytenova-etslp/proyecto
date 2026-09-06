@@ -1,11 +1,11 @@
 <?php
 require_once "php/conexion.php";
 
-$sql = "SELECT Producto.nombre, Producto.precio, Producto.precio_promocional,
-        Producto.imagen, Categoria.nombre AS categoria
-        FROM Producto
-        JOIN Categoria ON Producto.id_categoria = Categoria.id_categoria
-        WHERE Producto.id_producto = 1";
+$sql = "SELECT Producto.id_producto, Producto.nombre, Producto.precio, Producto.precio_promocional,
+		Producto.imagen, Categoria.nombre AS categoria
+		FROM Producto
+		JOIN Categoria ON Producto.id_categoria = Categoria.id_categoria
+		WHERE Producto.id_producto = 1";
 $resultado = mysqli_query($conexion, $sql);
 $producto = mysqli_fetch_assoc($resultado);
 ?>
@@ -52,7 +52,7 @@ $producto = mysqli_fetch_assoc($resultado);
 			<div class="cuadricula-productos">
 				<?php if ($producto): ?>
 					<div class="tarjeta-producto">
-						<a href="detalle-producto.html" class="enlace-imagen-producto">
+						<a href="detalle-producto.php?id=<?php echo $producto["id_producto"]; ?>" class="enlace-imagen-producto">
 							<div class="imagen-producto">
 								<img src="<?php echo htmlspecialchars($producto["imagen"]); ?>" alt="<?php echo htmlspecialchars($producto["nombre"]); ?>">
 							</div>
@@ -68,7 +68,7 @@ $producto = mysqli_fetch_assoc($resultado);
 							<?php endif; ?>
 
 							<div class="botones-producto">
-								<a href="detalle-producto.html" class="btn btn-secundario">Ver detalle</a>
+								<a href="detalle-producto.php?id=<?php echo $producto["id_producto"]; ?>" class="btn btn-secundario">Ver detalle</a>
 							</div>
 						</div>
 					</div>

@@ -2,10 +2,10 @@
 require_once "php/conexion.php";
 
 $sql = "SELECT Producto.id_producto, Producto.nombre, Producto.precio, Producto.precio_promocional,
-        Producto.imagen, Producto.stock, Categoria.nombre AS categoria
-        FROM Producto
-        JOIN Categoria ON Producto.id_categoria = Categoria.id_categoria
-        ORDER BY Producto.id_producto ASC";
+		Producto.imagen, Producto.stock, Categoria.nombre AS categoria
+		FROM Producto
+		JOIN Categoria ON Producto.id_categoria = Categoria.id_categoria
+		ORDER BY Producto.id_producto ASC";
 $resultado = mysqli_query($conexion, $sql);
 ?>
 <!DOCTYPE html>
@@ -81,9 +81,7 @@ $resultado = mysqli_query($conexion, $sql);
 								</div>
 
 								<div class="botones-producto">
-									<?php if ($producto["id_producto"] == 1): ?>
-										<a href="detalle-producto.html" class="btn btn-secundario">Ver detalle</a>
-									<?php endif; ?>
+									<a href="detalle-producto.php?id=<?php echo $producto["id_producto"]; ?>" class="btn btn-secundario">Ver detalle</a>
 									<button
 										type="button"
 										class="btn btn-agregar-producto"
