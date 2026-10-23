@@ -1,11 +1,19 @@
 <?php
 require_once "php/conexion.php";
 
-$sql = "SELECT Producto.id_producto, Producto.nombre, Producto.precio, Producto.precio_promocional,
+// Consulta las promociones activas y vigentes desde las nuevas tablas.
+$sql = "SELECT Producto.id_producto, Producto.nombre, Producto.precio,
+		(SELECT MIN(Promocion_Producto.precio_promocional)
+            FROM Promocion_Producto
+            JOIN Promocion ON Promocion_Producto.id_promocion = Promocion.id_promocion
+            WHERE Promocion_Producto.id_producto = Producto.id_producto
+                AND Promocion.activo = 1
+                AND CURRENT_DATE BETWEEN Promocion.fecha_inicio AND Promocion.fecha_fin)
+            AS precio_promocional,
 		Producto.imagen, Categoria.nombre AS categoria
 		FROM Producto
 		JOIN Categoria ON Producto.id_categoria = Categoria.id_categoria
-		WHERE Producto.id_producto = 1";
+		WHERE Producto.id_producto = 2 AND Producto.activo = 1";
 $resultado = mysqli_query($conexion, $sql);
 $producto = mysqli_fetch_assoc($resultado);
 ?>
