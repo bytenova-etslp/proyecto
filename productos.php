@@ -65,7 +65,7 @@ $resultado = mysqli_query($conexion, $sql);
 								$precioCarrito = $producto["precio_promocional"];
 							}
 
-							$sqlTalles = "SELECT talle FROM Producto_Talle WHERE id_producto = " . $producto["id_producto"];
+							$sqlTalles = "SELECT talle, stock FROM Producto_Talle WHERE id_producto = " . $producto["id_producto"] . " ORDER BY stock DESC, talle ASC";
 							$resultadoTalles = mysqli_query($conexion, $sqlTalles);
 						?>
 
@@ -87,7 +87,14 @@ $resultado = mysqli_query($conexion, $sql);
 									<label for="talle-<?php echo $producto["id_producto"]; ?>">Talle</label>
 									<select id="talle-<?php echo $producto["id_producto"]; ?>" class="selector-talle" data-producto-id="<?php echo $producto["id_producto"]; ?>">
 										<?php while ($filaTalle = mysqli_fetch_assoc($resultadoTalles)): ?>
-											<option value="<?php echo htmlspecialchars($filaTalle["talle"]); ?>"><?php echo htmlspecialchars($filaTalle["talle"]); ?></option>
+											<option value="<?php echo htmlspecialchars($filaTalle["talle"]); ?>" <?php if ($filaTalle["stock"] <= 0) echo "disabled"; ?>>
+											    <?php echo htmlspecialchars($filaTalle["talle"]); ?>
+											    <?php if ($filaTalle["stock"] > 0): ?>
+											        (<?php echo $filaTalle["stock"]; ?> disponibles)
+											    <?php else: ?>
+											        (agotado)
+											    <?php endif; ?>
+											</option>
 										<?php endwhile; ?>
 									</select>
 								</div>
@@ -100,7 +107,7 @@ $resultado = mysqli_query($conexion, $sql);
 										data-id="<?php echo $producto["id_producto"]; ?>"
 										data-nombre="<?php echo htmlspecialchars($producto["nombre"]); ?>"
 										data-precio="<?php echo $precioCarrito; ?>"
-										<?php if ($producto["stock"] == 0) echo "disabled"; ?>
+										<?php if ($producto["stock"] <= 0) echo "disabled"; ?>
 									>Agregar al Carrito</button>
 								</div>
 							</div>

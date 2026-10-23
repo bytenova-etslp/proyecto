@@ -11,7 +11,11 @@ $sql = "SELECT Producto.id_producto, Producto.nombre, Producto.descripcion, Prod
             WHERE Promocion_Producto.id_producto = Producto.id_producto
                 AND Promocion.activo = 1
                 AND CURRENT_DATE BETWEEN Promocion.fecha_inicio AND Promocion.fecha_fin)
-            AS precio_promocional, Producto.imagen, Categoria.nombre AS categoria
+            AS precio_promocional, Producto.imagen,
+        COALESCE((SELECT SUM(Producto_Talle.stock)
+            FROM Producto_Talle
+            WHERE Producto_Talle.id_producto = Producto.id_producto), 0) AS stock,
+        Categoria.nombre AS categoria
 		FROM Producto
 		JOIN Categoria ON Producto.id_categoria = Categoria.id_categoria
 		WHERE Producto.id_producto = $id AND Producto.activo = 1";
@@ -24,7 +28,7 @@ if ($producto) {
 		$precioCarrito = $producto["precio_promocional"];
 	}
 
-	$sqlTalles = "SELECT talle FROM Producto_Talle WHERE id_producto = $id";
+	$sqlTalles = "SELECT talle, stock FROM Producto_Talle WHERE id_producto = $id ORDER BY stock DESC, talle ASC";
 	$resultadoTalles = mysqli_query($conexion, $sqlTalles);
 }
 ?>
@@ -82,7 +86,14 @@ if ($producto) {
 						<label for="talle-detalle">Talle</label>
 						<select id="talle-detalle" class="selector-talle" data-producto-id="<?php echo $producto["id_producto"]; ?>">
 							<?php while ($filaTalle = mysqli_fetch_assoc($resultadoTalles)): ?>
-								<option value="<?php echo htmlspecialchars($filaTalle["talle"]); ?>"><?php echo htmlspecialchars($filaTalle["talle"]); ?></option>
+								<option value="<?php echo htmlspecialchars($filaTalle["talle"]); ?>" <?php if ($filaTalle["stock"] <= 0) echo "disabled"; ?>>
+								    <?php echo htmlspecialchars($filaTalle["talle"]); ?>
+								    <?php if ($filaTalle["stock"] > 0): ?>
+								        (<?php echo $filaTalle["stock"]; ?> disponibles)
+								    <?php else: ?>
+								        (agotado)
+								    <?php endif; ?>
+								</option>
 							<?php endwhile; ?>
 						</select>
 					</div>
@@ -94,6 +105,7 @@ if ($producto) {
 							data-id="<?php echo $producto["id_producto"]; ?>"
 							data-nombre="<?php echo htmlspecialchars($producto["nombre"]); ?>"
 							data-precio="<?php echo $precioCarrito; ?>"
+							<?php if ($producto["stock"] <= 0) echo "disabled"; ?>
 						>Agregar al Carrito</button>
 						<a href="productos.php" class="btn btn-secundario">Volver al catálogo</a>
 					</div>
