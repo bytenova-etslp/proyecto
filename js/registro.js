@@ -20,8 +20,8 @@ formulario.addEventListener("submit", async (event) => {
         return;
     }
 
-    if (password.length < 6) {
-        mensaje.textContent = "La contraseña debe tener al menos 6 caracteres.";
+    if (password.length < 8) {
+        mensaje.textContent = "La contraseña debe tener al menos 8 caracteres.";
         mensaje.style.color = "red";
         return;
     }
