@@ -8,11 +8,23 @@
 */
 
 // Agrega un producto o suma uno a la cantidad si ya estaba guardado con el mismo talle.
-function agregarAlCarrito(id, nombre, precio, talle) {
+function agregarAlCarrito(id, nombre, precio, talle, stock) {
+	// La disponibilidad corresponde al talle elegido al cargar la pagina.
+	if (!Number.isInteger(stock) || stock <= 0) {
+		mostrarMensaje("Este talle no tiene unidades disponibles.");
+		return;
+	}
 	const carrito = cargarCarrito();
 	const existente = carrito.find(item => item.id === id && item.talle === talle);
 
 	if (existente) {
+		// Actualiza tambien los articulos guardados antes de este cambio.
+		existente.stock = stock;
+		if (existente.cantidad >= stock) {
+			guardarCarrito(carrito);
+			mostrarMensaje(`Solo hay ${stock} unidades disponibles de este talle.`);
+			return;
+		}
 		existente.cantidad++;
 	} else {
 		carrito.push({
@@ -20,7 +32,8 @@ function agregarAlCarrito(id, nombre, precio, talle) {
 			nombre: nombre,
 			precio: precio,
 			talle: talle,
-			cantidad: 1
+			cantidad: 1,
+			stock: stock
 		});
 	}
 
@@ -40,9 +53,15 @@ function prepararBotonesAgregar() {
 			const precio = Number(boton.dataset.precio);
 			const selectorTalle = document.querySelector(`.selector-talle[data-producto-id="${id}"]`);
 
-			if (selectorTalle) {
-				agregarAlCarrito(id, nombre, precio, selectorTalle.value);
+			if (!selectorTalle) return;
+			const opcion = selectorTalle.selectedOptions[0];
+			if (!opcion || opcion.disabled) {
+				mostrarMensaje("Selecciona un talle disponible.");
+				return;
 			}
+
+			const stock = Number(opcion.dataset.stock);
+			agregarAlCarrito(id, nombre, precio, selectorTalle.value, stock);
 		});
 	});
 }

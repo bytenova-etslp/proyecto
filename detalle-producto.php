@@ -86,7 +86,7 @@ if ($producto) {
 						<label for="talle-detalle">Talle</label>
 						<select id="talle-detalle" class="selector-talle" data-producto-id="<?php echo $producto["id_producto"]; ?>">
 							<?php while ($filaTalle = mysqli_fetch_assoc($resultadoTalles)): ?>
-								<option value="<?php echo htmlspecialchars($filaTalle["talle"]); ?>" <?php if ($filaTalle["stock"] <= 0) echo "disabled"; ?>>
+								<option value="<?php echo htmlspecialchars($filaTalle["talle"]); ?>" data-stock="<?php echo (int)$filaTalle["stock"]; ?>" <?php if ($filaTalle["stock"] <= 0) echo "disabled"; ?>>
 								    <?php echo htmlspecialchars($filaTalle["talle"]); ?>
 								    <?php if ($filaTalle["stock"] > 0): ?>
 								        (<?php echo $filaTalle["stock"]; ?> disponibles)

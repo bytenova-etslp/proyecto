@@ -76,6 +76,18 @@ function cambiarCantidad(id, talle, cambio) {
 
 	if (!item) return;
 
+	// Permite reducir o eliminar articulos aunque sean de un carrito anterior.
+	if (cambio > 0) {
+		if (!Number.isInteger(item.stock) || item.stock < 0) {
+			alert("Vuelve al catalogo y agrega este talle para actualizar su disponibilidad.");
+			return;
+		}
+		if (item.cantidad + cambio > item.stock) {
+			alert(`Solo hay ${item.stock} unidades disponibles de este talle.`);
+			return;
+		}
+	}
+
 	item.cantidad += cambio;
 
 	// Si la cantidad llega a cero, el producto se elimina.
