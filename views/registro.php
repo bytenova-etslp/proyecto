@@ -10,7 +10,7 @@
 <body>
 
 	<!--
-		Archivo: registro.html
+		Archivo: views/registro.php
 		Proyecto: Punto Moda - ByteNova
 		Ultima actualizacion: 22/10/2026
 	-->
@@ -33,10 +33,10 @@
 		<div class="contenedor-autenticacion">
 			<div class="pestanas-autenticacion">
 				<a href="login.html" class="pestana-autenticacion">Iniciar Sesión</a>
-				<a href="registro.html" class="pestana-autenticacion activo">Registrarse</a>
+				<a href="index.php?pagina=registro" class="pestana-autenticacion activo">Registrarse</a>
 			</div>
 
-			<form id="form-registro" action="php/registro.php" method="post">
+			<form id="form-registro" action="index.php?pagina=registro" method="post">
 				<div class="grupo-formulario">
 					<label for="registro-nombre">Nombre completo</label>
 					<input type="text" id="registro-nombre" name="nombre" maxlength="100" autocomplete="name" placeholder="Nombre y apellido" required>

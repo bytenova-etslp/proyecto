@@ -1,4 +1,30 @@
 <?php
+// Enrutamiento inicial: el registro ya se abre y se envia desde index.php.
+$paginaSolicitada = $_GET["pagina"] ?? "inicio";
+
+switch ($paginaSolicitada) {
+    case "registro":
+        if ($_SERVER["REQUEST_METHOD"] === "POST") {
+            require __DIR__ . "/php/registro.php";
+        } elseif ($_SERVER["REQUEST_METHOD"] === "GET") {
+            require __DIR__ . "/views/registro.php";
+        } else {
+            header("Allow: GET, POST");
+            http_response_code(405);
+            echo "Metodo no permitido.";
+        }
+        exit;
+
+    case "inicio":
+        // Inicio conserva su codigo actual mientras completamos la migracion.
+        break;
+
+    default:
+        http_response_code(404);
+        echo "Pagina no encontrada.";
+        exit;
+}
+
 require_once "php/conexion.php";
 
 // Consulta las promociones activas y vigentes desde las nuevas tablas.
