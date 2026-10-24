@@ -1,123 +1,60 @@
 <?php
-// Enrutamiento inicial: el registro ya se abre y se envia desde index.php.
+// Punto de entrada de las paginas del sitio.
+require_once __DIR__ . "/controllers/ProductoController.php";
+require_once __DIR__ . "/controllers/UsuarioController.php";
+
 $paginaSolicitada = $_GET["pagina"] ?? "inicio";
 
 switch ($paginaSolicitada) {
+    case "inicio":
+    case "productos":
+    case "producto":
+        require_once __DIR__ . "/php/conexion.php";
+        mysqli_set_charset($conexion, "utf8mb4");
+        $controlador = new ProductoController($conexion);
+        if ($paginaSolicitada === "inicio") {
+            $controlador->mostrarInicio();
+        } elseif ($paginaSolicitada === "productos") {
+            $controlador->mostrarCatalogo();
+        } else {
+            $controlador->mostrarDetalle();
+        }
+        break;
+
     case "registro":
-        if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            require __DIR__ . "/php/registro.php";
-        } elseif ($_SERVER["REQUEST_METHOD"] === "GET") {
+        if ($_SERVER["REQUEST_METHOD"] === "GET") {
             require __DIR__ . "/views/registro.php";
+        } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
+            header("Content-Type: application/json; charset=utf-8");
+            mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+            try {
+                require_once __DIR__ . "/php/conexion.php";
+                mysqli_set_charset($conexion, "utf8mb4");
+                $controlador = new UsuarioController($conexion);
+                $controlador->procesarRegistro();
+            } catch (mysqli_sql_exception $error) {
+                http_response_code(500);
+                echo json_encode(["correcto" => false, "mensaje" => "No se pudo guardar la cuenta. Intenta nuevamente."]);
+            }
         } else {
             header("Allow: GET, POST");
             http_response_code(405);
-            echo "Metodo no permitido.";
+            $mensajeError = "Metodo no permitido.";
+            require __DIR__ . "/views/error.php";
         }
-        exit;
+        break;
 
-    case "inicio":
-        // Inicio conserva su codigo actual mientras completamos la migracion.
+    case "carrito":
+        require __DIR__ . "/views/carrito.php";
+        break;
+
+    case "login":
+        require __DIR__ . "/views/login.php";
         break;
 
     default:
         http_response_code(404);
-        echo "Pagina no encontrada.";
-        exit;
+        $mensajeError = "Pagina no encontrada.";
+        require __DIR__ . "/views/error.php";
+        break;
 }
-
-require_once "php/conexion.php";
-
-// Consulta las promociones activas y vigentes desde las nuevas tablas.
-$sql = "SELECT Producto.id_producto, Producto.nombre, Producto.precio,
-		(SELECT MIN(Promocion_Producto.precio_promocional)
-            FROM Promocion_Producto
-            JOIN Promocion ON Promocion_Producto.id_promocion = Promocion.id_promocion
-            WHERE Promocion_Producto.id_producto = Producto.id_producto
-                AND Promocion.activo = 1
-                AND CURRENT_DATE BETWEEN Promocion.fecha_inicio AND Promocion.fecha_fin)
-            AS precio_promocional,
-		Producto.imagen, Categoria.nombre AS categoria
-		FROM Producto
-		JOIN Categoria ON Producto.id_categoria = Categoria.id_categoria
-		WHERE Producto.id_producto = 2 AND Producto.activo = 1";
-$resultado = mysqli_query($conexion, $sql);
-$producto = mysqli_fetch_assoc($resultado);
-?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Punto Moda - Inicio</title>
-	<link rel="stylesheet" href="css/style.css">
-	<link rel="shortcut icon" type="image/png" href="imagenes/favicon.png">
-</head>
-<body>
-
-	<!--
-		Archivo: index.php
-		Proyecto: Punto Moda - ByteNova
-	-->
-
-	<!-- Encabezado y navegacion principal -->
-	<header>
-		<nav class="barra-navegacion">
-			<a href="index.php" class="logo">Punto <span>Moda</span></a>
-			<ul class="enlaces-navegacion">
-				<li><a href="index.php" class="activo">Inicio</a></li>
-				<li><a href="productos.php">Productos</a></li>
-				<li><a href="carrito.html">Carrito <span id="contador-carrito" class="contador-carrito">0</span></a></li>
-				<li><a href="login.html">Ingresar</a></li>
-			</ul>
-		</nav>
-	</header>
-
-	<main>
-		<!-- Presentacion principal del sitio -->
-		<section class="presentacion">
-			<h1>Bienvenidos a Punto Moda</h1>
-			<p>La revolución del e-commerce de indumentaria. Diseños exclusivos y calidad garantizada.</p>
-			<a href="productos.php" class="btn">Ver Catálogo</a>
-		</section>
-
-		<!-- El producto destacado se obtiene desde la base de datos -->
-		<section>
-			<h2 class="titulo-seccion">Producto Destacado</h2>
-			<div class="cuadricula-productos">
-				<?php if ($producto): ?>
-					<div class="tarjeta-producto">
-						<a href="detalle-producto.php?id=<?php echo $producto["id_producto"]; ?>" class="enlace-imagen-producto">
-							<div class="imagen-producto">
-								<img src="<?php echo htmlspecialchars($producto["imagen"]); ?>" alt="<?php echo htmlspecialchars($producto["nombre"]); ?>">
-							</div>
-						</a>
-						<div class="info-producto">
-							<div class="categoria-producto"><?php echo htmlspecialchars($producto["categoria"]); ?></div>
-							<h3 class="titulo-producto"><?php echo htmlspecialchars($producto["nombre"]); ?></h3>
-
-							<?php if ($producto["precio_promocional"] != null): ?>
-								<div class="precio-producto">$ <?php echo number_format($producto["precio_promocional"], 0, ",", "."); ?></div>
-							<?php else: ?>
-								<div class="precio-producto">$ <?php echo number_format($producto["precio"], 0, ",", "."); ?></div>
-							<?php endif; ?>
-
-							<div class="botones-producto">
-								<a href="detalle-producto.php?id=<?php echo $producto["id_producto"]; ?>" class="btn btn-secundario">Ver detalle</a>
-							</div>
-						</div>
-					</div>
-				<?php else: ?>
-					<p>No hay productos cargados en este momento.</p>
-				<?php endif; ?>
-			</div>
-		</section>
-	</main>
-
-	<footer>
-		<p>&copy; Diseñado por ByteNova 2026</p>
-	</footer>
-
-	<!-- Actualiza el contador del carrito guardado en LocalStorage -->
-	<script src="js/storage.js"></script>
-</body>
-</html>

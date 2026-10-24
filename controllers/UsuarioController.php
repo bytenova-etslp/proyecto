@@ -55,6 +55,7 @@ class UsuarioController {
     }
 
     private function responder($correcto, $mensaje, $codigo = 200) {
+        header("Content-Type: application/json; charset=utf-8");
         http_response_code($codigo);
         echo json_encode(["correcto" => $correcto, "mensaje" => $mensaje]);
         exit;

@@ -1,38 +1,13 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Punto Moda - Registro</title>
-	<link rel="stylesheet" href="css/style.css">
-	<link rel="shortcut icon" type="image/png" href="imagenes/favicon.png">
-</head>
-<body>
-
-	<!--
-		Archivo: views/registro.php
-		Proyecto: Punto Moda - ByteNova
-		Ultima actualizacion: 22/10/2026
-	-->
-
-	<!-- Encabezado y navegacion principal -->
-	<header>
-		<nav class="barra-navegacion">
-			<a href="index.php" class="logo">Punto <span>Moda</span></a>
-			<ul class="enlaces-navegacion">
-				<li><a href="index.php">Inicio</a></li>
-				<li><a href="productos.php">Productos</a></li>
-				<li><a href="carrito.html">Carrito <span id="contador-carrito" class="contador-carrito">0</span></a></li>
-				<li><a href="login.html" class="activo">Ingresar</a></li>
-			</ul>
-		</nav>
-	</header>
-
-	<main>
+<?php
+$tituloPagina = "Punto Moda - Registro";
+$seccionActiva = "login";
+require __DIR__ . "/header.php";
+?>
+<main>
 		<!-- Formulario de registro conectado con PHP mediante JavaScript. -->
 		<div class="contenedor-autenticacion">
 			<div class="pestanas-autenticacion">
-				<a href="login.html" class="pestana-autenticacion">Iniciar Sesión</a>
+				<a href="index.php?pagina=login" class="pestana-autenticacion">Iniciar Sesión</a>
 				<a href="index.php?pagina=registro" class="pestana-autenticacion activo">Registrarse</a>
 			</div>
 
@@ -60,17 +35,12 @@
 				<button type="submit" class="btn">Crear cuenta</button>
 				<p id="mensaje-registro" class="mensaje-formulario" aria-live="polite"></p>
 				<div class="pie-autenticacion">
-					<p>¿Ya tenés cuenta? <a href="login.html">Iniciá sesión acá</a></p>
+					<p>¿Ya tenés cuenta? <a href="index.php?pagina=login">Iniciá sesión acá</a></p>
 				</div>
 			</form>
 		</div>
 	</main>
-
-	<footer>
-		<p>&copy; Diseñado por ByteNova 2026</p>
-	</footer>
-
-	<script src="js/storage.js"></script>
-	<script src="js/registro.js"></script>
-</body>
-</html>
+<?php
+$scriptExtra = "js/registro.js";
+require __DIR__ . "/footer.php";
+?>
