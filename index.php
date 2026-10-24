@@ -5,6 +5,7 @@ require_once __DIR__ . "/config/auth.php";
 require_once __DIR__ . "/controllers/ProductoController.php";
 require_once __DIR__ . "/controllers/UsuarioController.php";
 require_once __DIR__ . "/controllers/AdminController.php";
+require_once __DIR__ . "/controllers/AdminProductoController.php";
 
 // Los cambios de rol o de estado se aplican tambien a sesiones ya abiertas.
 if (estaLogueado()) {
@@ -60,6 +61,37 @@ switch ($paginaSolicitada) {
         mysqli_set_charset($conexion, "utf8mb4");
         $controlador = new AdminController($conexion);
         $controlador->panel();
+        break;
+
+    case "admin_productos":
+    case "admin_producto_crear":
+    case "admin_producto_editar":
+    case "admin_producto_estado":
+        requerirRol(["empleado", "administrador"]);
+        $metodo = $_SERVER["REQUEST_METHOD"];
+        if (!in_array($metodo, ["GET", "POST"], true) || ($paginaSolicitada === "admin_productos" && $metodo !== "GET")) {
+            header($paginaSolicitada === "admin_productos" ? "Allow: GET" : "Allow: GET, POST");
+            http_response_code(405);
+            $mensajeError = "Metodo no permitido.";
+            require __DIR__ . "/views/error.php";
+            break;
+        }
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            require_once __DIR__ . "/php/conexion.php";
+            mysqli_set_charset($conexion, "utf8mb4");
+            $controlador = new AdminProductoController($conexion);
+            switch ($paginaSolicitada) {
+                case "admin_productos": $controlador->listar(); break;
+                case "admin_producto_crear": $controlador->crear(); break;
+                case "admin_producto_editar": $controlador->editar(); break;
+                case "admin_producto_estado": $controlador->cambiarEstado(); break;
+            }
+        } catch (mysqli_sql_exception $error) {
+            http_response_code(500);
+            $mensajeError = "No se pudo acceder a los productos. Intenta nuevamente.";
+            require __DIR__ . "/views/error.php";
+        }
         break;
 
     case "carrito":

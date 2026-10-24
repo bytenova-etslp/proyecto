@@ -56,7 +56,7 @@ class UsuarioController {
 
     public function login() {
         if (estaLogueado()) {
-            redirigir(esAdmin() ? "admin" : "inicio");
+            redirigir(paginaInicialUsuario());
         }
         $errores = [];
         $email = "";
@@ -79,7 +79,7 @@ class UsuarioController {
                             $errores[] = "Tu cuenta esta desactivada. Comunicate con el administrador.";
                         } else {
                             iniciarSesionUsuario($usuario);
-                            redirigir(esAdmin() ? "admin" : "inicio");
+                            redirigir(paginaInicialUsuario());
                         }
                     } else {
                         $errores[] = "Correo o contrasena incorrectos.";

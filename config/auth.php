@@ -49,7 +49,8 @@ function requerirLogin() {
 
 function requerirRol($rol) {
     requerirLogin();
-    if (usuarioActualRol() !== $rol) {
+    $roles = is_array($rol) ? $rol : [$rol];
+    if (!in_array(usuarioActualRol(), $roles, true)) {
         http_response_code(403);
         require __DIR__ . "/../views/sin_permiso.php";
         exit;
@@ -68,4 +69,18 @@ function sincronizarSesion($usuarioModel) {
     }
     $_SESSION["nombre"] = $usuario["nombre"];
     $_SESSION["rol"] = $usuario["rol"];
+}
+
+function puedeGestionarProductos() {
+    return in_array(usuarioActualRol(), ["empleado", "administrador"], true);
+}
+
+function paginaInicialUsuario() {
+    if (esAdmin()) {
+        return "admin";
+    }
+    if (usuarioActualRol() === "empleado") {
+        return "admin_productos";
+    }
+    return "inicio";
 }

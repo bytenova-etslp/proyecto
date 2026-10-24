@@ -18,6 +18,9 @@
 				<li><a href="index.php" <?php if ($seccionActiva === "inicio") echo 'class="activo"'; ?>>Inicio</a></li>
 				<li><a href="index.php?pagina=productos" <?php if ($seccionActiva === "productos") echo 'class="activo"'; ?>>Productos</a></li>
 				<li><a href="index.php?pagina=carrito" <?php if ($seccionActiva === "carrito") echo 'class="activo"'; ?>>Carrito <span id="contador-carrito" class="contador-carrito">0</span></a></li>
+                <?php if (puedeGestionarProductos()): ?>
+                    <li><a href="index.php?pagina=admin_productos" <?php if ($seccionActiva === "gestion_productos") echo 'class="activo"'; ?>>Gestionar productos</a></li>
+                <?php endif; ?>
 				<?php if (esAdmin()): ?>
 					<li><a href="index.php?pagina=admin" <?php if ($seccionActiva === "admin") echo 'class="activo"'; ?>>Administración</a></li>
 				<?php endif; ?>

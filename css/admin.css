@@ -39,3 +39,22 @@
 .tabla th {
     background: #f0f0f0;
 }
+
+.acciones-admin { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0; }
+.aviso-admin { padding: 12px; margin: 16px 0; border: 1px solid #ccc; background: #fff; }
+.errores-admin { padding: 16px 32px; margin: 16px 0; color: #9f1732; background: #fff0f3; }
+.producto-inactivo { opacity: 0.65; }
+.miniatura { width: 64px; height: 64px; object-fit: cover; border-radius: 4px; }
+.miniatura-grande { width: 180px; max-width: 100%; height: 150px; object-fit: contain; }
+.talle-stock { display: block; white-space: nowrap; }
+.stock-bajo { display: block; color: #9f1732; }
+.tabla td a { display: inline-block; margin: 4px; }
+.form-admin { max-width: 850px; margin: 24px auto; }
+.form-admin textarea, .form-admin select, .form-admin fieldset input {
+    width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;
+}
+.form-admin fieldset { min-width: 0; padding: 16px; margin: 20px 0; border: 1px solid #ccc; }
+.form-admin legend { font-weight: bold; padding: 0 8px; }
+.form-admin small { display: block; margin-top: 6px; }
+.form-admin .tabla input { min-width: 100px; }
+.form-admin input[readonly] { background: #eef0f4; }
