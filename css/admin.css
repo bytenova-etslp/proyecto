@@ -1,0 +1,41 @@
+.tarjetas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.tarjeta {
+    flex: 1 1 220px;
+    padding: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.tarjeta p {
+    margin-top: 8px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.contenedor-tabla {
+    overflow-x: auto;
+    margin-top: 16px;
+}
+
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla th,
+.tabla td {
+    padding: 8px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.tabla th {
+    background: #f0f0f0;
+}

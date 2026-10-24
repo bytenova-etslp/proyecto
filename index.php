@@ -4,6 +4,14 @@ require_once __DIR__ . "/config/auth.php";
 // Punto de entrada de las paginas del sitio.
 require_once __DIR__ . "/controllers/ProductoController.php";
 require_once __DIR__ . "/controllers/UsuarioController.php";
+require_once __DIR__ . "/controllers/AdminController.php";
+
+// Los cambios de rol o de estado se aplican tambien a sesiones ya abiertas.
+if (estaLogueado()) {
+    require_once __DIR__ . "/php/conexion.php";
+    mysqli_set_charset($conexion, "utf8mb4");
+    sincronizarSesion(new UsuarioModel($conexion));
+}
 
 $paginaSolicitada = $_GET["pagina"] ?? "inicio";
 
@@ -44,6 +52,14 @@ switch ($paginaSolicitada) {
             $mensajeError = "Metodo no permitido.";
             require __DIR__ . "/views/error.php";
         }
+        break;
+
+    case "admin":
+        requerirRol("administrador");
+        require_once __DIR__ . "/php/conexion.php";
+        mysqli_set_charset($conexion, "utf8mb4");
+        $controlador = new AdminController($conexion);
+        $controlador->panel();
         break;
 
     case "carrito":

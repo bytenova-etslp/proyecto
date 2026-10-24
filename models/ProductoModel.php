@@ -8,7 +8,7 @@ class ProductoModel {
     }
 
     public function listarProductos() {
-        $sql = "SELECT Producto.id_producto, Producto.nombre, Producto.precio,
+        $sql = "SELECT Producto.id_producto, Producto.nombre, Producto.precio, Producto.stock_minimo,
 		(SELECT MIN(Promocion_Producto.precio_promocional)
             FROM Promocion_Producto
             JOIN Promocion ON Promocion_Producto.id_promocion = Promocion.id_promocion

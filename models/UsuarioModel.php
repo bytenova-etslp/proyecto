@@ -28,4 +28,16 @@ class UsuarioModel {
         mysqli_stmt_close($consulta);
         return $usuario;
     }
+
+    public function obtenerPorId($idUsuario) {
+        $sql = "SELECT id_usuario, nombre, rol, activo
+                FROM Usuario WHERE id_usuario = ?";
+        $consulta = mysqli_prepare($this->conexion, $sql);
+        mysqli_stmt_bind_param($consulta, "i", $idUsuario);
+        mysqli_stmt_execute($consulta);
+        $resultado = mysqli_stmt_get_result($consulta);
+        $usuario = mysqli_fetch_assoc($resultado);
+        mysqli_stmt_close($consulta);
+        return $usuario;
+    }
 }

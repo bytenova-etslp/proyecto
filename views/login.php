@@ -11,6 +11,10 @@ require __DIR__ . "/header.php";
 				<a href="index.php?pagina=registro" class="pestana-autenticacion">Registrarse</a>
 			</div>
 
+            <?php if (($_GET["cuenta"] ?? "") === "desactivada"): ?>
+                <p class="mensaje-formulario">Tu sesión terminó porque la cuenta ya no está habilitada.</p>
+            <?php endif; ?>
+
 			<form id="form-login" action="index.php?pagina=login" method="post">
 				<div class="grupo-formulario">
 					<label for="login-email">Correo Electrónico</label>
