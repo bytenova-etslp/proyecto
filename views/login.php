@@ -4,24 +4,30 @@ $seccionActiva = "login";
 require __DIR__ . "/header.php";
 ?>
 <main>
-		<!-- Formulario de inicio de sesion. La conexion con PHP se agregara mas adelante. -->
+		<!-- PHP valida las credenciales y vuelve a mostrar los errores si es necesario. -->
 		<div class="contenedor-autenticacion">
 			<div class="pestanas-autenticacion">
 				<a href="index.php?pagina=login" class="pestana-autenticacion activo">Iniciar Sesión</a>
 				<a href="index.php?pagina=registro" class="pestana-autenticacion">Registrarse</a>
 			</div>
 
-			<form id="form-login" action="#">
+			<form id="form-login" action="index.php?pagina=login" method="post">
 				<div class="grupo-formulario">
 					<label for="login-email">Correo Electrónico</label>
-					<input type="email" id="login-email" placeholder="ejemplo@correo.com" required>
+					<input type="email" id="login-email" name="email" maxlength="100" autocomplete="email" value="<?php echo escapar($email); ?>" placeholder="ejemplo@correo.com" required>
 				</div>
 				<div class="grupo-formulario">
 					<label for="login-password">Contraseña</label>
-					<input type="password" id="login-password" placeholder="********" required>
+					<input type="password" id="login-password" name="contrasena" autocomplete="current-password" placeholder="********" required>
 				</div>
 				<button type="submit" class="btn">Ingresar</button>
-				<p id="mensaje-login" class="mensaje-formulario"></p>
+				<?php if (!empty($errores)): ?>
+                    <ul id="mensaje-login" class="mensaje-formulario" aria-live="polite">
+                        <?php foreach ($errores as $error): ?>
+                            <li><?php echo escapar($error); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
 				<div class="pie-autenticacion">
 					<p>¿No tenés cuenta? <a href="index.php?pagina=registro">Registrate acá</a></p>
 				</div>
@@ -29,6 +35,5 @@ require __DIR__ . "/header.php";
 		</div>
 	</main>
 <?php
-$scriptExtra = "js/login.js";
 require __DIR__ . "/footer.php";
 ?>

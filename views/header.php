@@ -15,7 +15,16 @@
 				<li><a href="index.php" <?php if ($seccionActiva === "inicio") echo 'class="activo"'; ?>>Inicio</a></li>
 				<li><a href="index.php?pagina=productos" <?php if ($seccionActiva === "productos") echo 'class="activo"'; ?>>Productos</a></li>
 				<li><a href="index.php?pagina=carrito" <?php if ($seccionActiva === "carrito") echo 'class="activo"'; ?>>Carrito <span id="contador-carrito" class="contador-carrito">0</span></a></li>
-				<li><a href="index.php?pagina=login" <?php if ($seccionActiva === "login") echo 'class="activo"'; ?>>Ingresar</a></li>
+				<?php if (estaLogueado()): ?>
+					<li><span>Hola, <?php echo escapar(usuarioActualNombre()); ?></span></li>
+					<li>
+						<form action="index.php?pagina=logout" method="post">
+							<button type="submit" class="btn btn-secundario">Cerrar sesión</button>
+						</form>
+					</li>
+				<?php else: ?>
+					<li><a href="index.php?pagina=login" <?php if ($seccionActiva === "login") echo 'class="activo"'; ?>>Ingresar</a></li>
+				<?php endif; ?>
 			</ul>
 		</nav>
 	</header>

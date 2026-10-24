@@ -1,4 +1,6 @@
 <?php
+session_start();
+require_once __DIR__ . "/config/auth.php";
 // Punto de entrada de las paginas del sitio.
 require_once __DIR__ . "/controllers/ProductoController.php";
 require_once __DIR__ . "/controllers/UsuarioController.php";
@@ -49,7 +51,31 @@ switch ($paginaSolicitada) {
         break;
 
     case "login":
-        require __DIR__ . "/views/login.php";
+    case "logout":
+        $metodo = $_SERVER["REQUEST_METHOD"];
+        if (($paginaSolicitada === "login" && !in_array($metodo, ["GET", "POST"], true))
+            || ($paginaSolicitada === "logout" && $metodo !== "POST")) {
+            header($paginaSolicitada === "logout" ? "Allow: POST" : "Allow: GET, POST");
+            http_response_code(405);
+            $mensajeError = "Metodo no permitido.";
+            require __DIR__ . "/views/error.php";
+            break;
+        }
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            require_once __DIR__ . "/php/conexion.php";
+            mysqli_set_charset($conexion, "utf8mb4");
+            $controlador = new UsuarioController($conexion);
+            if ($paginaSolicitada === "login") {
+                $controlador->login();
+            } else {
+                $controlador->logout();
+            }
+        } catch (mysqli_sql_exception $error) {
+            http_response_code(500);
+            $mensajeError = "No se pudo comprobar la cuenta. Intenta nuevamente.";
+            require __DIR__ . "/views/error.php";
+        }
         break;
 
     default:

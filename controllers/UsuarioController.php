@@ -54,6 +54,47 @@ class UsuarioController {
         }
     }
 
+    public function login() {
+        if (estaLogueado()) {
+            redirigir("inicio");
+        }
+        $errores = [];
+        $email = "";
+
+        if ($_SERVER["REQUEST_METHOD"] === "POST") {
+            $emailRecibido = $_POST["email"] ?? "";
+            $contrasena = $_POST["contrasena"] ?? "";
+            if (!is_string($emailRecibido) || !is_string($contrasena)) {
+                $errores[] = "Los datos del formulario no son validos.";
+            } else {
+                $email = trim($emailRecibido);
+                if ($email === "" || $contrasena === "") {
+                    $errores[] = "Completa el correo y la contrasena.";
+                } elseif (strlen($email) > 100 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $errores[] = "Ingresa un correo valido de hasta 100 caracteres.";
+                } else {
+                    $usuario = $this->usuarioModel->buscarPorEmail($email);
+                    if ($usuario && password_verify($contrasena, $usuario["contrasena"])) {
+                        if ((int)$usuario["activo"] !== 1) {
+                            $errores[] = "Tu cuenta esta desactivada. Comunicate con el administrador.";
+                        } else {
+                            iniciarSesionUsuario($usuario);
+                            redirigir("inicio");
+                        }
+                    } else {
+                        $errores[] = "Correo o contrasena incorrectos.";
+                    }
+                }
+            }
+        }
+        require __DIR__ . "/../views/login.php";
+    }
+
+    public function logout() {
+        cerrarSesion();
+        redirigir("login");
+    }
+
     private function responder($correcto, $mensaje, $codigo = 200) {
         header("Content-Type: application/json; charset=utf-8");
         http_response_code($codigo);

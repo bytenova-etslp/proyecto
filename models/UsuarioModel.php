@@ -16,4 +16,16 @@ class UsuarioModel {
         mysqli_stmt_close($consulta);
         return $guardado;
     }
+
+    public function buscarPorEmail($email) {
+        $sql = "SELECT id_usuario, nombre, email, contrasena, rol, activo
+                FROM Usuario WHERE email = ? LIMIT 1";
+        $consulta = mysqli_prepare($this->conexion, $sql);
+        mysqli_stmt_bind_param($consulta, "s", $email);
+        mysqli_stmt_execute($consulta);
+        $resultado = mysqli_stmt_get_result($consulta);
+        $usuario = mysqli_fetch_assoc($resultado);
+        mysqli_stmt_close($consulta);
+        return $usuario;
+    }
 }
