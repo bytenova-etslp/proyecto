@@ -14,7 +14,36 @@ class ProductoController {
     }
 
     public function mostrarCatalogo() {
-        $productos = $this->productoModel->listarProductos();
+        $categorias = $this->productoModel->listarCategorias();
+        $idCategoriaSeleccionada = null;
+        $busqueda = "";
+        $erroresFiltros = [];
+        $categoriaRecibida = $_GET["categoria"] ?? "";
+        $busquedaRecibida = $_GET["q"] ?? "";
+
+        if (!is_string($categoriaRecibida)) {
+            $erroresFiltros[] = "La categoría seleccionada no es válida.";
+        } elseif ($categoriaRecibida !== "") {
+            $id = filter_var($categoriaRecibida, FILTER_VALIDATE_INT);
+            $idsValidos = array_map("intval", array_column($categorias, "id_categoria"));
+            if ($id === false || !in_array($id, $idsValidos, true)) {
+                $erroresFiltros[] = "Seleccioná una categoría existente.";
+            } else {
+                $idCategoriaSeleccionada = $id;
+            }
+        }
+        if (!is_string($busquedaRecibida)) {
+            $erroresFiltros[] = "El texto de búsqueda no es válido.";
+        } else {
+            $busqueda = mb_substr(trim($busquedaRecibida), 0, 50);
+        }
+        $productos = empty($erroresFiltros)
+            ? $this->productoModel->listarProductos($idCategoriaSeleccionada, $busqueda)
+            : [];
+        $urlSinBusqueda = "index.php?pagina=productos";
+        if ($idCategoriaSeleccionada !== null) {
+            $urlSinBusqueda .= "&categoria=" . $idCategoriaSeleccionada;
+        }
         foreach ($productos as $indice => $producto) {
             $productos[$indice]["talles"] = $this->productoModel->listarTalles($producto["id_producto"]);
             $productos[$indice]["precio_carrito"] = $producto["precio_promocional"] ?? $producto["precio"];

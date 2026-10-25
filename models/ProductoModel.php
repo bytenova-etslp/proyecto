@@ -7,7 +7,7 @@ class ProductoModel {
         $this->conexion = $conexion;
     }
 
-    public function listarProductos() {
+    public function listarProductos($idCategoria = null, $busqueda = "") {
         $sql = "SELECT Producto.id_producto, Producto.nombre, Producto.precio, Producto.stock_minimo,
 		(SELECT MIN(Promocion_Producto.precio_promocional)
             FROM Promocion_Producto
@@ -22,13 +22,33 @@ class ProductoModel {
             WHERE Producto_Talle.id_producto = Producto.id_producto), 0) AS stock, Categoria.nombre AS categoria
 		FROM Producto
 		JOIN Categoria ON Producto.id_categoria = Categoria.id_categoria
-		WHERE Producto.activo = 1
-		ORDER BY Producto.id_producto ASC";
-        $resultado = mysqli_query($this->conexion, $sql);
+		WHERE Producto.activo = 1";
+        $tipos = "";
+        $parametros = [];
+        if ($idCategoria !== null) {
+            $sql .= " AND Producto.id_categoria = ?";
+            $tipos .= "i";
+            $parametros[] = $idCategoria;
+        }
+        if ($busqueda !== "") {
+            $sql .= " AND (Producto.nombre LIKE ? OR Producto.descripcion LIKE ?)";
+            $tipos .= "ss";
+            $patron = "%" . $this->escaparLike($busqueda) . "%";
+            $parametros[] = $patron;
+            $parametros[] = $patron;
+        }
+        $sql .= " ORDER BY Producto.id_producto ASC";
+        $consulta = $this->conexion->prepare($sql);
+        if (!empty($parametros)) {
+            $consulta->bind_param($tipos, ...$parametros);
+        }
+        $consulta->execute();
+        $resultado = $consulta->get_result();
         $productos = [];
-        while ($producto = mysqli_fetch_assoc($resultado)) {
+        while ($producto = $resultado->fetch_assoc()) {
             $productos[] = $producto;
         }
+        $consulta->close();
         return $productos;
     }
 
@@ -72,11 +92,14 @@ class ProductoModel {
     }
 
     public function listarCategorias() {
-        $resultado = $this->conexion->query("SELECT id_categoria, nombre FROM Categoria ORDER BY nombre");
+        $consulta = $this->conexion->prepare("SELECT id_categoria, nombre FROM Categoria ORDER BY nombre");
+        $consulta->execute();
+        $resultado = $consulta->get_result();
         $categorias = [];
         while ($categoria = $resultado->fetch_assoc()) {
             $categorias[] = $categoria;
         }
+        $consulta->close();
         return $categorias;
     }
 
@@ -88,11 +111,14 @@ class ProductoModel {
                            WHERE Producto_Talle.id_producto = Producto.id_producto), 0) AS stock
                 FROM Producto JOIN Categoria ON Producto.id_categoria = Categoria.id_categoria
                 ORDER BY Producto.activo DESC, Producto.nombre ASC";
-        $resultado = $this->conexion->query($sql);
+        $consulta = $this->conexion->prepare($sql);
+        $consulta->execute();
+        $resultado = $consulta->get_result();
         $productos = [];
         while ($producto = $resultado->fetch_assoc()) {
             $productos[] = $producto;
         }
+        $consulta->close();
         return $productos;
     }
 
@@ -175,5 +201,10 @@ class ProductoModel {
         $correcto = $consulta->execute();
         $consulta->close();
         return $correcto;
+    }
+
+    // Los simbolos % y _ escritos por el usuario se buscan como texto literal.
+    private function escaparLike($texto) {
+        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $texto);
     }
 }

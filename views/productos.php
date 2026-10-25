@@ -1,12 +1,47 @@
 <?php
 $tituloPagina = "Punto Moda - Productos";
 $seccionActiva = "productos";
+$estiloExtra = "css/catalogo.css";
 require __DIR__ . "/header.php";
 ?>
 <main>
 		<section>
 			<h2 class="titulo-seccion">Nuestro Catálogo</h2>
 			<p class="texto-introductorio">Explorá nuestras prendas exclusivas.</p>
+
+            <form action="index.php" method="get" class="buscador">
+                <input type="hidden" name="pagina" value="productos">
+                <div class="campo-busqueda">
+                    <label for="q">Buscar productos</label>
+                    <input type="text" id="q" name="q" maxlength="50" placeholder="Ej.: campera" value="<?php echo escapar($busqueda); ?>">
+                </div>
+                <div class="campo-busqueda">
+                    <label for="categoria">Categoría</label>
+                    <select id="categoria" name="categoria">
+                        <option value="">Todas las categorías</option>
+                        <?php foreach ($categorias as $categoria): ?>
+                            <option value="<?php echo (int)$categoria["id_categoria"]; ?>" <?php if ($idCategoriaSeleccionada === (int)$categoria["id_categoria"]) echo "selected"; ?>><?php echo escapar($categoria["nombre"]); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Buscar</button>
+                <a href="index.php?pagina=productos" class="btn btn-secundario">Ver todos</a>
+            </form>
+            <?php if (!empty($erroresFiltros)): ?>
+                <ul class="errores-busqueda" role="alert">
+                    <?php foreach ($erroresFiltros as $error): ?>
+                        <li><?php echo escapar($error); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php else: ?>
+                <p class="resumen-busqueda" role="status">
+                    <?php echo count($productos); ?> producto(s) encontrado(s).
+                    <?php if ($busqueda !== ""): ?>
+                        Búsqueda: <strong><?php echo escapar($busqueda); ?></strong>.
+                        <a href="<?php echo escapar($urlSinBusqueda); ?>">Limpiar búsqueda</a>
+                    <?php endif; ?>
+                </p>
+            <?php endif; ?>
 
 			<!-- PHP genera una tarjeta por cada producto de la base de datos -->
 			<div id="catalogo-container" class="cuadricula-productos">
@@ -62,7 +97,7 @@ require __DIR__ . "/header.php";
 					<?php endforeach; ?>
 
 				<?php else: ?>
-					<p>No hay productos cargados en este momento.</p>
+					<p>No encontramos productos con esos criterios.</p>
 				<?php endif; ?>
 			</div>
 		</section>

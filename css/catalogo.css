@@ -1,0 +1,39 @@
+.buscador {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.campo-busqueda {
+    flex: 1 1 220px;
+}
+
+.campo-busqueda label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.campo-busqueda input,
+.campo-busqueda select {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    background: #fff;
+}
+
+.resumen-busqueda {
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.errores-busqueda {
+    margin: 16px 0;
+    padding: 16px 32px;
+    background: #fff0f3;
+    color: #9f1732;
+}
