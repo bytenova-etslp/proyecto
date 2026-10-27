@@ -1,0 +1,35 @@
+.contenedor-carrito .carrito-resumen {
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.carrito-resumen > p {
+    flex-basis: 100%;
+}
+.contenedor-carrito button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+#mensaje-pedido {
+    margin-top: 1rem;
+}
+.confirmacion-pedido > p {
+    margin: 1rem 0;
+}
+.tabla-pedido-contenedor {
+    overflow-x: auto;
+    margin: 1.5rem 0;
+}
+.tabla-pedido {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+.tabla-pedido caption {
+    text-align: left;
+    font-weight: bold;
+    padding-bottom: .75rem;
+}
+.tabla-pedido th, .tabla-pedido td {
+    border-bottom: 1px solid #ddd;
+    padding: .75rem;
+}

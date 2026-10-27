@@ -6,6 +6,7 @@ require_once __DIR__ . "/controllers/ProductoController.php";
 require_once __DIR__ . "/controllers/UsuarioController.php";
 require_once __DIR__ . "/controllers/AdminController.php";
 require_once __DIR__ . "/controllers/AdminProductoController.php";
+require_once __DIR__ . "/controllers/PedidoController.php";
 
 // Los cambios de rol o de estado se aplican tambien a sesiones ya abiertas.
 if (estaLogueado()) {
@@ -91,6 +92,52 @@ switch ($paginaSolicitada) {
             http_response_code(500);
             $mensajeError = "No se pudo acceder a los productos. Intenta nuevamente.";
             require __DIR__ . "/views/error.php";
+        }
+        break;
+
+    case "confirmar_pedido":
+    case "pedido":
+        $esConfirmacion = $paginaSolicitada === "confirmar_pedido";
+        if ($esConfirmacion) {
+            header("Content-Type: application/json; charset=utf-8");
+        }
+        if ($_SERVER["REQUEST_METHOD"] !== ($esConfirmacion ? "POST" : "GET")) {
+            header($esConfirmacion ? "Allow: POST" : "Allow: GET");
+            http_response_code(405);
+            if ($esConfirmacion) {
+                echo json_encode(["correcto" => false, "mensaje" => "Metodo no permitido."]);
+            } else {
+                $mensajeError = "Metodo no permitido.";
+                require __DIR__ . "/views/error.php";
+            }
+            break;
+        }
+        if ($esConfirmacion && (!estaLogueado() || usuarioActualRol() !== "cliente")) {
+            http_response_code(estaLogueado() ? 403 : 401);
+            echo json_encode(["correcto" => false, "mensaje" => "Debes ingresar con una cuenta de cliente para confirmar el pedido."]);
+            break;
+        }
+        if (!$esConfirmacion) {
+            requerirRol("cliente");
+        }
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            require_once __DIR__ . "/php/conexion.php";
+            mysqli_set_charset($conexion, "utf8mb4");
+            $controlador = new PedidoController($conexion);
+            if ($esConfirmacion) {
+                $controlador->confirmar();
+            } else {
+                $controlador->ver();
+            }
+        } catch (mysqli_sql_exception $error) {
+            http_response_code(500);
+            if ($esConfirmacion) {
+                echo json_encode(["correcto" => false, "mensaje" => "No se pudo guardar el pedido. El carrito se conserva."]);
+            } else {
+                $mensajeError = "No se pudo consultar el pedido. Intenta nuevamente.";
+                require __DIR__ . "/views/error.php";
+            }
         }
         break;
 

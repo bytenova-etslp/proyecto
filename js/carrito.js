@@ -7,6 +7,8 @@
 	Se encarga de mostrar, modificar, eliminar y vaciar productos del carrito.
 */
 
+let enviandoPedido = false;
+
 // Dibuja el contenido actual del carrito dentro de #carrito-container.
 function mostrarCarrito() {
 	const carrito = cargarCarrito();
@@ -41,20 +43,27 @@ function mostrarCarrito() {
 		// 2) Agregar su informacion, talle y botones.
 		div.innerHTML = `
 			<div class="item-info">
-				<span class="item-nombre">${item.nombre}</span>
-				<span class="item-talle">Talle: ${item.talle || "Sin especificar"}</span>
-				<span class="item-precio-unitario">$${item.precio.toLocaleString("es-UY")} c/u</span>
+				<span class="item-nombre"></span>
+				<span class="item-talle"></span>
+				<span class="item-precio-unitario"></span>
 			</div>
 
 			<div class="item-cantidad">
 				<button class="btn-cantidad btn-restar" aria-label="Restar uno">−</button>
-				<span class="item-cantidad-numero">${item.cantidad}</span>
+				<span class="item-cantidad-numero"></span>
 				<button class="btn-cantidad btn-sumar" aria-label="Sumar uno">+</button>
 			</div>
 
-			<span class="item-subtotal">$${subtotal.toLocaleString("es-UY")}</span>
+			<span class="item-subtotal"></span>
 			<button class="btn-eliminar" aria-label="Eliminar producto">✕</button>
 		`;
+
+        // Los datos del carrito se muestran como texto, sin interpretarlos como HTML.
+        div.querySelector(".item-nombre").textContent = item.nombre;
+        div.querySelector(".item-talle").textContent = `Talle: ${item.talle || "Sin especificar"}`;
+        div.querySelector(".item-precio-unitario").textContent = `$${Number(item.precio).toLocaleString("es-UY")} c/u`;
+        div.querySelector(".item-cantidad-numero").textContent = item.cantidad;
+        div.querySelector(".item-subtotal").textContent = `$${subtotal.toLocaleString("es-UY")}`;
 
 		// Cada boton modifica solamente este producto y talle.
 		div.querySelector(".btn-sumar").addEventListener("click", () => cambiarCantidad(item.id, item.talle, 1));
@@ -71,6 +80,7 @@ function mostrarCarrito() {
 
 // Suma o resta una unidad a la cantidad de un producto y talle.
 function cambiarCantidad(id, talle, cambio) {
+    if (enviandoPedido) return;
 	let carrito = cargarCarrito();
 	const item = carrito.find(producto => producto.id === id && producto.talle === talle);
 
@@ -101,6 +111,7 @@ function cambiarCantidad(id, talle, cambio) {
 
 // Elimina por completo un producto de un talle determinado.
 function eliminarDelCarrito(id, talle) {
+    if (enviandoPedido) return;
 	const carrito = cargarCarrito().filter(producto => !(producto.id === id && producto.talle === talle));
 	guardarCarrito(carrito);
 	mostrarCarrito();
@@ -108,18 +119,53 @@ function eliminarDelCarrito(id, talle) {
 
 // Vacia todos los productos guardados.
 function vaciarCarrito() {
+    if (enviandoPedido) return;
 	guardarCarrito([]);
 	mostrarCarrito();
 }
 
-// Por ahora la compra es simulada y el pedido no se guarda en la base de datos.
-function finalizarCompra() {
+// PHP recibe solo producto, talle y cantidad. Los precios salen de la base.
+async function finalizarCompra() {
+	if (enviandoPedido) return;
 	const carrito = cargarCarrito();
-
 	if (carrito.length === 0) return;
 
-	alert("Compra simulada. El pedido todavía no se guarda en la base de datos.");
-	vaciarCarrito();
+    const mensaje = document.getElementById("mensaje-pedido");
+    const botones = document.querySelectorAll(".contenedor-carrito button");
+    enviandoPedido = true;
+    botones.forEach(boton => { boton.disabled = true; });
+    mensaje.textContent = "Guardando pedido...";
+    let navegar = false;
+    try {
+        const datos = new FormData();
+        datos.append("carrito", JSON.stringify(carrito.map(item => ({
+            id: item.id, talle: item.talle, cantidad: item.cantidad
+        }))));
+        const respuesta = await fetch("index.php?pagina=confirmar_pedido", {
+            method: "POST", body: datos
+        });
+        // Una cuenta desactivada durante la compra vuelve al ingreso.
+        if (respuesta.redirected || respuesta.status === 401) {
+            navegar = true;
+            window.location.href = respuesta.redirected ? respuesta.url : "index.php?pagina=login";
+            return;
+        }
+        const resultado = await respuesta.json();
+        if (!respuesta.ok || !resultado.correcto) {
+            mensaje.textContent = resultado.mensaje || "No se pudo guardar el pedido. El carrito se conserva.";
+            return;
+        }
+        guardarCarrito([]);
+        navegar = true;
+        window.location.href = "index.php?pagina=pedido&id=" + Number(resultado.id_pedido);
+    } catch (error) {
+        mensaje.textContent = "No se pudo confirmar la respuesta del servidor. El carrito se conserva. Comprueba tu conexion antes de volver a intentar.";
+    } finally {
+        if (!navegar) {
+            enviandoPedido = false;
+            botones.forEach(boton => { boton.disabled = false; });
+        }
+    }
 }
 
 // Conecta los botones una vez que termino de cargar el HTML.
