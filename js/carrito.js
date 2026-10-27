@@ -157,9 +157,9 @@ async function finalizarCompra() {
         }
         guardarCarrito([]);
         navegar = true;
-        window.location.href = "index.php?pagina=pedido&id=" + Number(resultado.id_pedido);
+        window.location.href = "index.php?pagina=pago&id=" + Number(resultado.id_pedido);
     } catch (error) {
-        mensaje.textContent = "No se pudo confirmar la respuesta del servidor. El carrito se conserva. Comprueba tu conexion antes de volver a intentar.";
+        mensaje.textContent = "No se pudo confirmar la respuesta del servidor. El carrito se conserva. Revisa Mis pedidos antes de volver a intentar.";
     } finally {
         if (!navegar) {
             enviandoPedido = false;

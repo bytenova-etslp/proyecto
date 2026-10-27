@@ -21,6 +21,9 @@
                 <?php if (puedeGestionarProductos()): ?>
                     <li><a href="index.php?pagina=admin_productos" <?php if ($seccionActiva === "gestion_productos") echo 'class="activo"'; ?>>Gestionar productos</a></li>
                 <?php endif; ?>
+                <?php if (usuarioActualRol() === "cliente"): ?>
+                    <li><a href="index.php?pagina=mis_pedidos" <?php if ($seccionActiva === "mis_pedidos") echo 'class="activo"'; ?>>Mis pedidos</a></li>
+                <?php endif; ?>
 				<?php if (esAdmin()): ?>
 					<li><a href="index.php?pagina=admin" <?php if ($seccionActiva === "admin") echo 'class="activo"'; ?>>Administración</a></li>
 				<?php endif; ?>

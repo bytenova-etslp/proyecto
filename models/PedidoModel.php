@@ -88,6 +88,22 @@ class PedidoModel {
         return $pedido;
     }
 
+    public function listarDelCliente($idUsuario) {
+        $consulta = $this->conexion->prepare("SELECT Pedido.id_pedido, Pedido.fecha, Pedido.estado,
+            COALESCE((SELECT SUM(cantidad * precio_unitario) FROM Detalle_Pedido
+                WHERE Detalle_Pedido.id_pedido = Pedido.id_pedido), 0) AS total
+            FROM Pedido WHERE id_usuario = ? ORDER BY Pedido.id_pedido DESC");
+        $consulta->bind_param("i", $idUsuario);
+        $consulta->execute();
+        $resultado = $consulta->get_result();
+        $pedidos = [];
+        while ($pedido = $resultado->fetch_assoc()) {
+            $pedidos[] = $pedido;
+        }
+        $consulta->close();
+        return $pedidos;
+    }
+
     // El controlador verifica primero que el pedido pertenezca al cliente.
     public function obtenerDetalle($idPedido) {
         $consulta = $this->conexion->prepare("SELECT Producto.nombre, Detalle_Pedido.talle, Detalle_Pedido.cantidad, Detalle_Pedido.precio_unitario

@@ -33,3 +33,103 @@
     border-bottom: 1px solid #ddd;
     padding: .75rem;
 }
+.pago-distribucion {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+.formulario-pago {
+    display: grid;
+    gap: 1.25rem;
+    min-width: 0;
+    padding: 1.75rem;
+    background: #fff;
+    border: 1px solid #e4e7ed;
+    border-radius: 12px;
+}
+.formulario-pago h3, .resumen-pago h3 {
+    color: #1a1a2e;
+    font-size: 1.15rem;
+}
+.campo-pago {
+    display: grid;
+    gap: .5rem;
+    min-width: 0;
+}
+.campo-pago label {
+    font-size: .9rem;
+    font-weight: 600;
+}
+.fila-pago {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+.formulario-pago input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: .8rem;
+    font: inherit;
+    border: 1px solid #c7cbd3;
+    border-radius: 7px;
+}
+.formulario-pago input:focus-visible {
+    outline: 2px solid #e94560;
+    outline-offset: 2px;
+}
+.formulario-pago .btn {
+    margin-top: .5rem;
+}
+.errores-pago {
+    padding: 1rem 1rem 1rem 2rem;
+    border-left: 4px solid #b42842;
+    background: #fff0f2;
+    color: #7d1428;
+}
+.resumen-pago {
+    padding: 1.75rem;
+    background: #fff;
+    border: 1px solid #e4e7ed;
+    border-radius: 12px;
+}
+.resumen-pago > p {
+    margin: .75rem 0 1.5rem;
+    color: #666;
+}
+.resumen-pago dl > div {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .75rem;
+    padding: .85rem 0;
+}
+.resumen-pago dd {
+    font-weight: 600;
+}
+.resumen-pago .importe-pago {
+    margin-top: .5rem;
+    border-top: 1px solid #e4e7ed;
+    color: #1a1a2e;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+.resumen-pago > a {
+    display: inline-block;
+    margin-top: 1rem;
+    color: #b32843;
+}
+@media (max-width: 700px) {
+    .pago-distribucion {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .formulario-pago, .resumen-pago {
+        padding: 1.25rem;
+    }
+}
+@media (max-width: 380px) {
+    .fila-pago {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

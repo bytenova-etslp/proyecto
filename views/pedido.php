@@ -1,6 +1,6 @@
 <?php
 $tituloPagina = "Punto Moda - Pedido";
-$seccionActiva = "carrito";
+$seccionActiva = "mis_pedidos";
 $estiloExtra = "css/pedidos.css";
 require __DIR__ . "/header.php";
 ?>
@@ -8,7 +8,8 @@ require __DIR__ . "/header.php";
     <section class="contenedor-carrito confirmacion-pedido">
         <h2 class="titulo-seccion">Pedido #<?php echo escapar($pedido["id_pedido"]); ?> registrado</h2>
         <p>Fecha: <?php echo escapar($pedido["fecha"]); ?></p>
-        <p>Estado: <?php echo escapar($pedido["estado"]); ?>. El pago queda por definir.</p>
+        <p>Estado: <strong><?php echo escapar($pedido["estado"]); ?></strong></p>
+        <p>Medio de pago: <?php echo escapar($pedido["metodo_pago"] === "tarjeta_ficticia" ? "Tarjeta" : "Por definir"); ?></p>
         <div class="tabla-pedido-contenedor">
             <table class="tabla-pedido">
                 <caption>Detalle guardado del pedido</caption>
@@ -28,6 +29,29 @@ require __DIR__ . "/header.php";
         </div>
         <p class="total-carrito">Total: $<?php echo escapar(number_format($total, 2, ",", ".")); ?></p>
         <p>Los importes corresponden a los precios vigentes al registrar el pedido.</p>
+        <?php if (in_array($pedido["estado"], ["pendiente", "rechazado"], true)): ?>
+            <a class="btn" href="index.php?pagina=pago&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>"><?php echo $pedido["estado"] === "rechazado" ? "Reintentar pago" : "Pagar con tarjeta"; ?></a>
+        <?php endif; ?>
+        <?php if (!empty($pagos)): ?>
+            <div class="tabla-pedido-contenedor">
+                <table class="tabla-pedido">
+                    <caption>Historial de pagos</caption>
+                    <thead><tr><th>Intento</th><th>Fecha</th><th>Resultado</th><th>Importe</th><th>Terminacion</th></tr></thead>
+                    <tbody>
+                        <?php foreach ($pagos as $pago): ?>
+                            <tr>
+                                <td><?php echo escapar($pago["id_pago"]); ?></td>
+                                <td><?php echo escapar($pago["fecha"]); ?></td>
+                                <td><?php echo escapar($pago["resultado"]); ?></td>
+                                <td>$<?php echo escapar(number_format((float)$pago["monto"], 2, ",", ".")); ?></td>
+                                <td>**** <?php echo escapar($pago["ultimos4"]); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+        <a class="btn btn-secundario" href="index.php?pagina=mis_pedidos">Mis pedidos</a>
         <a class="btn" href="index.php?pagina=productos">Seguir comprando</a>
     </section>
 </main>

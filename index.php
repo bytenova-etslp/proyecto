@@ -141,6 +141,36 @@ switch ($paginaSolicitada) {
         }
         break;
 
+    case "pago":
+    case "pago_resultado":
+    case "mis_pedidos":
+        requerirRol("cliente");
+        $metodo = $_SERVER["REQUEST_METHOD"];
+        $metodosPermitidos = $paginaSolicitada === "pago" ? ["GET", "POST"] : ["GET"];
+        if (!in_array($metodo, $metodosPermitidos, true)) {
+            header("Allow: " . implode(", ", $metodosPermitidos));
+            http_response_code(405);
+            $mensajeError = "Metodo no permitido.";
+            require __DIR__ . "/views/error.php";
+            break;
+        }
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            require_once __DIR__ . "/php/conexion.php";
+            mysqli_set_charset($conexion, "utf8mb4");
+            $controlador = new PedidoController($conexion);
+            switch ($paginaSolicitada) {
+                case "pago": $controlador->pagar(); break;
+                case "pago_resultado": $controlador->resultado(); break;
+                case "mis_pedidos": $controlador->misPedidos(); break;
+            }
+        } catch (mysqli_sql_exception $error) {
+            http_response_code(500);
+            $mensajeError = "No se pudo completar la operacion del pedido. Revisa Mis pedidos antes de volver a intentar.";
+            require __DIR__ . "/views/error.php";
+        }
+        break;
+
     case "carrito":
         require __DIR__ . "/views/carrito.php";
         break;
