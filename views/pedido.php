@@ -10,6 +10,7 @@ require __DIR__ . "/header.php";
         <p>Fecha: <?php echo escapar($pedido["fecha"]); ?></p>
         <p>Estado: <strong><?php echo escapar($pedido["estado"]); ?></strong></p>
         <p>Medio de pago: <?php echo escapar($pedido["metodo_pago"] === "tarjeta_ficticia" ? "Tarjeta" : "Por definir"); ?></p>
+        <?php require __DIR__ . "/envio_resumen.php"; ?>
         <div class="tabla-pedido-contenedor">
             <table class="tabla-pedido">
                 <caption>Detalle guardado del pedido</caption>

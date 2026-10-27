@@ -8,8 +8,12 @@ require __DIR__ . "/header.php";
     <h1 class="titulo-seccion">Panel de administración</h1>
     <p>Bienvenido, <strong><?php echo escapar($nombreAdmin); ?></strong>.</p>
 
-    <p class="acciones-admin"><a href="index.php?pagina=admin_productos" class="btn">Gestionar productos</a></p>
+    <p class="acciones-admin">
+        <a href="index.php?pagina=admin_productos" class="btn">Gestionar productos</a>
+        <a href="index.php?pagina=admin_pedidos" class="btn">Pedidos recibidos</a>
+    </p>
 
+    <?php if (esAdmin()): ?>
     <section class="tarjetas" aria-label="Resumen del catálogo">
         <article class="tarjeta">
             <h2>Productos activos</h2>
@@ -53,5 +57,6 @@ require __DIR__ . "/header.php";
             </div>
         <?php endif; ?>
     </section>
+    <?php endif; ?>
 </main>
 <?php require __DIR__ . "/footer.php"; ?>

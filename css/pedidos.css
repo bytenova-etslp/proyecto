@@ -67,7 +67,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
 }
-.formulario-pago input {
+.formulario-pago input:not([type="hidden"]), .formulario-pago select {
     width: 100%;
     box-sizing: border-box;
     padding: .8rem;
@@ -75,9 +75,36 @@
     border: 1px solid #c7cbd3;
     border-radius: 7px;
 }
-.formulario-pago input:focus-visible {
+.formulario-pago input:focus-visible, .formulario-pago select:focus-visible {
     outline: 2px solid #e94560;
     outline-offset: 2px;
+}
+.lineas-checkout {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+}
+.lineas-checkout li {
+    display: grid;
+    gap: .4rem;
+    padding: .85rem 0;
+    border-bottom: 1px solid #e4e7ed;
+}
+.lineas-checkout li span {
+    font-size: .9rem;
+}
+.resumen-envio {
+    margin: 1.25rem 0;
+}
+.resumen-envio address {
+    display: grid;
+    gap: .4rem;
+    margin-top: .8rem;
+    font-style: normal;
+    overflow-wrap: anywhere;
+}
+#mensaje-checkout {
+    overflow-wrap: anywhere;
 }
 .formulario-pago .btn {
     margin-top: .5rem;

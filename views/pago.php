@@ -46,6 +46,7 @@ require __DIR__ . "/header.php";
                     <div><dt>Medio de pago</dt><dd>Tarjeta</dd></div>
                     <div class="importe-pago"><dt>Total a pagar</dt><dd>$<?php echo escapar(number_format($total, 2, ",", ".")); ?></dd></div>
                 </dl>
+                <?php require __DIR__ . "/envio_resumen.php"; ?>
                 <a href="index.php?pagina=pedido&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>">Volver al detalle del pedido</a>
             </aside>
         </div>

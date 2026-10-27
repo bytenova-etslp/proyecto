@@ -4,6 +4,15 @@ function escapar($texto) {
     return htmlspecialchars((string)$texto, ENT_QUOTES, "UTF-8");
 }
 
+// Los telefonos nuevos se guardan como nueve digitos y se muestran en grupos de tres.
+function formatearTelefono($telefono) {
+    $telefono = (string)$telefono;
+    if (preg_match('/^[0-9]{9}$/', $telefono)) {
+        return substr($telefono, 0, 3) . " " . substr($telefono, 3, 3) . " " . substr($telefono, 6, 3);
+    }
+    return $telefono;
+}
+
 function redirigir($pagina, $extra = "") {
     header("Location: index.php?pagina=" . $pagina . $extra);
     exit;
@@ -75,12 +84,13 @@ function puedeGestionarProductos() {
     return in_array(usuarioActualRol(), ["empleado", "administrador"], true);
 }
 
+function puedeConsultarPedidos() {
+    return in_array(usuarioActualRol(), ["empleado", "administrador"], true);
+}
+
 function paginaInicialUsuario() {
-    if (esAdmin()) {
+    if (in_array(usuarioActualRol(), ["empleado", "administrador"], true)) {
         return "admin";
-    }
-    if (usuarioActualRol() === "empleado") {
-        return "admin_productos";
     }
     return "inicio";
 }

@@ -27,7 +27,7 @@ require __DIR__ . "/header.php";
                 <?php endif; ?>
 				<div class="carrito-acciones">
 					<button id="btn-vaciar" class="btn btn-secundario">Vaciar carrito</button>
-					<button id="btn-finalizar" class="btn" <?php if (usuarioActualRol() !== "cliente") echo 'disabled'; ?>>Confirmar pedido</button>
+					<button id="btn-finalizar" class="btn" <?php if (usuarioActualRol() !== "cliente") echo 'disabled'; ?>>Continuar compra</button>
 				</div>
 			</div>
             <p id="mensaje-pedido" role="status" aria-live="polite"></p>

@@ -39,6 +39,7 @@ header {
 .enlaces-navegacion {
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 }
 
 .barra-navegacion {

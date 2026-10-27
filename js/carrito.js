@@ -124,49 +124,29 @@ function vaciarCarrito() {
 	mostrarCarrito();
 }
 
-// PHP recibe solo producto, talle y cantidad. Los precios salen de la base.
-async function finalizarCompra() {
+// El checkout recibe solo producto, talle y cantidad. Todavia no crea un pedido.
+function finalizarCompra() {
 	if (enviandoPedido) return;
 	const carrito = cargarCarrito();
 	if (carrito.length === 0) return;
 
-    const mensaje = document.getElementById("mensaje-pedido");
-    const botones = document.querySelectorAll(".contenedor-carrito button");
     enviandoPedido = true;
-    botones.forEach(boton => { boton.disabled = true; });
-    mensaje.textContent = "Guardando pedido...";
-    let navegar = false;
-    try {
-        const datos = new FormData();
-        datos.append("carrito", JSON.stringify(carrito.map(item => ({
-            id: item.id, talle: item.talle, cantidad: item.cantidad
-        }))));
-        const respuesta = await fetch("index.php?pagina=confirmar_pedido", {
-            method: "POST", body: datos
-        });
-        // Una cuenta desactivada durante la compra vuelve al ingreso.
-        if (respuesta.redirected || respuesta.status === 401) {
-            navegar = true;
-            window.location.href = respuesta.redirected ? respuesta.url : "index.php?pagina=login";
-            return;
-        }
-        const resultado = await respuesta.json();
-        if (!respuesta.ok || !resultado.correcto) {
-            mensaje.textContent = resultado.mensaje || "No se pudo guardar el pedido. El carrito se conserva.";
-            return;
-        }
-        guardarCarrito([]);
-        navegar = true;
-        window.location.href = "index.php?pagina=pago&id=" + Number(resultado.id_pedido);
-    } catch (error) {
-        mensaje.textContent = "No se pudo confirmar la respuesta del servidor. El carrito se conserva. Revisa Mis pedidos antes de volver a intentar.";
-    } finally {
-        if (!navegar) {
-            enviandoPedido = false;
-            botones.forEach(boton => { boton.disabled = false; });
-        }
-    }
+    const formulario = document.createElement("form");
+    formulario.method = "POST";
+    formulario.action = "index.php?pagina=checkout";
+    const campo = document.createElement("input");
+    campo.type = "hidden";
+    campo.name = "carrito";
+    campo.value = JSON.stringify(carrito.map(item => ({
+        id: item.id, talle: item.talle, cantidad: item.cantidad
+    })));
+    formulario.appendChild(campo);
+    document.body.appendChild(formulario);
+    formulario.submit();
 }
+
+// Permite volver a continuar si el navegador recupera el carrito desde su cache.
+window.addEventListener("pageshow", () => { enviandoPedido = false; });
 
 // Conecta los botones una vez que termino de cargar el HTML.
 document.addEventListener("DOMContentLoaded", () => {

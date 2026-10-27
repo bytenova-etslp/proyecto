@@ -7,6 +7,7 @@ require_once __DIR__ . "/controllers/UsuarioController.php";
 require_once __DIR__ . "/controllers/AdminController.php";
 require_once __DIR__ . "/controllers/AdminProductoController.php";
 require_once __DIR__ . "/controllers/PedidoController.php";
+require_once __DIR__ . "/controllers/AdminPedidoController.php";
 
 // Los cambios de rol o de estado se aplican tambien a sesiones ya abiertas.
 if (estaLogueado()) {
@@ -57,7 +58,7 @@ switch ($paginaSolicitada) {
         break;
 
     case "admin":
-        requerirRol("administrador");
+        requerirRol(["empleado", "administrador"]);
         require_once __DIR__ . "/php/conexion.php";
         mysqli_set_charset($conexion, "utf8mb4");
         $controlador = new AdminController($conexion);
@@ -91,6 +92,54 @@ switch ($paginaSolicitada) {
         } catch (mysqli_sql_exception $error) {
             http_response_code(500);
             $mensajeError = "No se pudo acceder a los productos. Intenta nuevamente.";
+            require __DIR__ . "/views/error.php";
+        }
+        break;
+
+    case "admin_pedidos":
+    case "admin_pedido":
+        requerirRol(["empleado", "administrador"]);
+        if ($_SERVER["REQUEST_METHOD"] !== "GET") {
+            header("Allow: GET");
+            http_response_code(405);
+            $mensajeError = "Método no permitido.";
+            require __DIR__ . "/views/error.php";
+            break;
+        }
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            require_once __DIR__ . "/php/conexion.php";
+            mysqli_set_charset($conexion, "utf8mb4");
+            $controlador = new AdminPedidoController($conexion);
+            if ($paginaSolicitada === "admin_pedidos") {
+                $controlador->listar();
+            } else {
+                $controlador->detalle();
+            }
+        } catch (mysqli_sql_exception $error) {
+            http_response_code(500);
+            $mensajeError = "No se pudieron consultar los pedidos. Intentá nuevamente.";
+            require __DIR__ . "/views/error.php";
+        }
+        break;
+
+    case "checkout":
+        requerirRol("cliente");
+        if (!in_array($_SERVER["REQUEST_METHOD"], ["GET", "POST"], true)) {
+            header("Allow: GET, POST");
+            http_response_code(405);
+            $mensajeError = "Método no permitido.";
+            require __DIR__ . "/views/error.php";
+            break;
+        }
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            require_once __DIR__ . "/php/conexion.php";
+            mysqli_set_charset($conexion, "utf8mb4");
+            (new PedidoController($conexion))->checkout();
+        } catch (mysqli_sql_exception $error) {
+            http_response_code(500);
+            $mensajeError = "No se pudo consultar el carrito. Volvé a intentarlo desde Carrito.";
             require __DIR__ . "/views/error.php";
         }
         break;

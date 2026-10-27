@@ -6,11 +6,14 @@ class PedidoModel {
         $this->conexion = $conexion;
     }
 
-    public function crearCompleto($idUsuario, $carrito) {
+    public function crearCompleto($idUsuario, $carrito, $envio) {
         $this->conexion->begin_transaction();
         try {
-            $consulta = $this->conexion->prepare("INSERT INTO Pedido (fecha, estado, metodo_pago, id_usuario) VALUES (CURRENT_TIMESTAMP, 'pendiente', 'por_definir', ?)");
-            $consulta->bind_param("i", $idUsuario);
+            $consulta = $this->conexion->prepare("INSERT INTO Pedido (fecha, estado, metodo_pago, id_usuario,
+                envio_nombre, envio_direccion, envio_ciudad, envio_departamento, envio_telefono)
+                VALUES (CURRENT_TIMESTAMP, 'pendiente', 'por_definir', ?, ?, ?, ?, ?, ?)");
+            $consulta->bind_param("isssss", $idUsuario, $envio["nombre"], $envio["direccion"],
+                $envio["ciudad"], $envio["departamento"], $envio["telefono"]);
             $consulta->execute();
             $idPedido = (int)$this->conexion->insert_id;
             $consulta->close();
@@ -42,8 +45,35 @@ class PedidoModel {
         }
     }
 
+    // Prepara el resumen sin registrar pedidos ni reservar existencias.
+    public function resumirCarrito($items) {
+        $lineas = [];
+        $total = 0;
+        $variantes = [];
+        foreach ($items as $item) {
+            $variante = $this->obtenerVarianteParaCompra($item["id"], $item["talle"]);
+            if (!$variante) {
+                throw new InvalidArgumentException("Un producto ya no está disponible o el talle no existe. Revisá el carrito.");
+            }
+            $clave = $item["id"] . ":" . $variante["talle"];
+            if (isset($variantes[$clave])) {
+                throw new InvalidArgumentException("Hay un producto y talle repetidos. Revisá el carrito.");
+            }
+            $variantes[$clave] = true;
+            if ((int)$variante["stock"] < $item["cantidad"]) {
+                throw new InvalidArgumentException("No hay stock suficiente para uno de los talles. Revisá las cantidades del carrito.");
+            }
+            $precio = $variante["precio_promocional"] ?? $variante["precio"];
+            $subtotal = (float)$precio * $item["cantidad"];
+            $lineas[] = ["id" => $item["id"], "nombre" => $variante["nombre"], "talle" => $variante["talle"],
+                "cantidad" => $item["cantidad"], "precio" => $precio, "subtotal" => $subtotal];
+            $total += $subtotal;
+        }
+        return ["lineas" => $lineas, "total" => $total];
+    }
+
     private function obtenerVarianteParaCompra($idProducto, $talle) {
-        $consulta = $this->conexion->prepare("SELECT Producto.precio, Producto_Talle.talle, Producto_Talle.stock,
+        $consulta = $this->conexion->prepare("SELECT Producto.nombre, Producto.precio, Producto_Talle.talle, Producto_Talle.stock,
             (SELECT MIN(Promocion_Producto.precio_promocional)
              FROM Promocion_Producto
              JOIN Promocion ON Promocion.id_promocion = Promocion_Producto.id_promocion
@@ -80,7 +110,9 @@ class PedidoModel {
     }
 
     public function obtenerDelCliente($idPedido, $idUsuario) {
-        $consulta = $this->conexion->prepare("SELECT id_pedido, fecha, estado, metodo_pago FROM Pedido WHERE id_pedido = ? AND id_usuario = ?");
+        $consulta = $this->conexion->prepare("SELECT id_pedido, fecha, estado, metodo_pago,
+            envio_nombre, envio_direccion, envio_ciudad, envio_departamento, envio_telefono
+            FROM Pedido WHERE id_pedido = ? AND id_usuario = ?");
         $consulta->bind_param("ii", $idPedido, $idUsuario);
         $consulta->execute();
         $pedido = $consulta->get_result()->fetch_assoc();
@@ -104,7 +136,47 @@ class PedidoModel {
         return $pedidos;
     }
 
-    // El controlador verifica primero que el pedido pertenezca al cliente.
+    public function listarParaGestion($estado = "") {
+        $sql = $this->sqlParaGestion();
+        if ($estado !== "") {
+            $sql .= " WHERE Pedido.estado = ?";
+        }
+        $sql .= " ORDER BY Pedido.id_pedido DESC";
+        $consulta = $this->conexion->prepare($sql);
+        if ($estado !== "") {
+            $consulta->bind_param("s", $estado);
+        }
+        $consulta->execute();
+        $resultado = $consulta->get_result();
+        $pedidos = [];
+        while ($pedido = $resultado->fetch_assoc()) {
+            $pedidos[] = $pedido;
+        }
+        $consulta->close();
+        return $pedidos;
+    }
+
+    // Solo se usa desde el controlador protegido del personal.
+    public function obtenerParaGestion($idPedido) {
+        $consulta = $this->conexion->prepare($this->sqlParaGestion() . " WHERE Pedido.id_pedido = ?");
+        $consulta->bind_param("i", $idPedido);
+        $consulta->execute();
+        $pedido = $consulta->get_result()->fetch_assoc();
+        $consulta->close();
+        return $pedido;
+    }
+
+    private function sqlParaGestion() {
+        return "SELECT Pedido.id_pedido, Pedido.fecha, Pedido.estado, Pedido.metodo_pago,
+            Pedido.envio_nombre, Pedido.envio_direccion, Pedido.envio_ciudad,
+            Pedido.envio_departamento, Pedido.envio_telefono,
+            Usuario.nombre AS cliente_nombre, Usuario.email AS cliente_email,
+            COALESCE((SELECT SUM(cantidad * precio_unitario) FROM Detalle_Pedido
+                WHERE Detalle_Pedido.id_pedido = Pedido.id_pedido), 0) AS total
+            FROM Pedido JOIN Usuario ON Usuario.id_usuario = Pedido.id_usuario";
+    }
+
+    // El controlador verifica la propiedad del cliente o los permisos del personal.
     public function obtenerDetalle($idPedido) {
         $consulta = $this->conexion->prepare("SELECT Producto.nombre, Detalle_Pedido.talle, Detalle_Pedido.cantidad, Detalle_Pedido.precio_unitario
             FROM Detalle_Pedido JOIN Producto ON Producto.id_producto = Detalle_Pedido.id_producto

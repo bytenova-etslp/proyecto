@@ -5,10 +5,35 @@ require_once __DIR__ . "/../models/PagoModel.php";
 class PedidoController {
     private $modelo;
     private $pagoModel;
+    private $departamentos = [
+        "Artigas", "Canelones", "Cerro Largo", "Colonia", "Durazno", "Flores", "Florida",
+        "Lavalleja", "Maldonado", "Montevideo", "Paysandú", "Río Negro", "Rivera", "Rocha",
+        "Salto", "San José", "Soriano", "Tacuarembó", "Treinta y Tres"
+    ];
 
     public function __construct($conexion) {
         $this->modelo = new PedidoModel($conexion);
         $this->pagoModel = new PagoModel($conexion);
+    }
+
+    public function checkout() {
+        requerirRol("cliente");
+        $carrito = $this->leerCarrito();
+        if (empty($carrito)) {
+            redirigir("carrito");
+        }
+        try {
+            $resumen = $this->modelo->resumirCarrito($carrito);
+        } catch (InvalidArgumentException $error) {
+            http_response_code(422);
+            $mensajeError = $error->getMessage();
+            require __DIR__ . "/../views/error.php";
+            return;
+        }
+        $carritoJson = json_encode($carrito);
+        $departamentos = $this->departamentos;
+        $nombreDestinatario = usuarioActualNombre();
+        require __DIR__ . "/../views/checkout.php";
     }
 
     public function confirmar() {
@@ -18,11 +43,32 @@ class PedidoController {
             echo json_encode(["correcto" => false, "mensaje" => "Se requiere una cuenta de cliente."]);
             return;
         }
+        $carrito = $this->leerCarrito();
+        if (empty($carrito)) {
+            $this->responderError("El carrito está vacío o sus datos no son válidos.");
+            return;
+        }
+        $envio = $this->leerEnvio();
+        $errores = $this->validarEnvio($envio);
+        if (!empty($errores)) {
+            $this->responderError(implode(" ", $errores));
+            return;
+        }
+        try {
+            // La direccion, el telefono, el pedido, su detalle y el stock
+            // se guardan juntos dentro de la transaccion del modelo.
+            $idPedido = $this->modelo->crearCompleto(usuarioActualId(), $carrito, $envio);
+            echo json_encode(["correcto" => true, "id_pedido" => $idPedido]);
+        } catch (InvalidArgumentException $error) {
+            $this->responderError($error->getMessage());
+        }
+    }
+
+    private function leerCarrito() {
         $json = $_POST["carrito"] ?? null;
         $items = is_string($json) ? json_decode($json, true) : null;
         if (!is_array($items) || !array_is_list($items) || count($items) === 0) {
-            $this->responderError("El carrito esta vacio o sus datos no son validos.");
-            return;
+            return [];
         }
 
         $carrito = [];
@@ -32,19 +78,48 @@ class PedidoController {
                 || !is_int($item["cantidad"]) || $item["cantidad"] < 1 || $item["cantidad"] > 2147483647
                 || !is_string($item["talle"]) || trim($item["talle"]) === ""
                 || mb_strlen($item["talle"], "UTF-8") > 10) {
-                $this->responderError("Revisa los productos, talles y cantidades del carrito.");
-                return;
+                return [];
             }
             // Los precios y el stock recibidos se ignoran.
             $carrito[] = ["id" => $item["id"], "talle" => $item["talle"], "cantidad" => $item["cantidad"]];
         }
 
-        try {
-            $idPedido = $this->modelo->crearCompleto(usuarioActualId(), $carrito);
-            echo json_encode(["correcto" => true, "id_pedido" => $idPedido]);
-        } catch (InvalidArgumentException $error) {
-            $this->responderError($error->getMessage());
+        return $carrito;
+    }
+
+    private function leerEnvio() {
+        $envio = [];
+        foreach (["nombre", "direccion", "ciudad", "departamento", "telefono"] as $campo) {
+            $valor = $_POST["envio_" . $campo] ?? "";
+            $envio[$campo] = is_string($valor) ? trim($valor) : "";
         }
+        return $envio;
+    }
+
+    private function validarEnvio(&$envio) {
+        $errores = [];
+        if (!$this->largoEntre($envio["nombre"], 3, 60)) {
+            $errores[] = "El nombre del destinatario debe tener entre 3 y 60 caracteres.";
+        }
+        if (!$this->largoEntre($envio["direccion"], 5, 100)) {
+            $errores[] = "La dirección debe tener entre 5 y 100 caracteres.";
+        }
+        if (!$this->largoEntre($envio["ciudad"], 2, 50)) {
+            $errores[] = "La ciudad debe tener entre 2 y 50 caracteres.";
+        }
+        if (!in_array($envio["departamento"], $this->departamentos, true)) {
+            $errores[] = "Elegí un departamento de la lista.";
+        }
+        $envio["telefono"] = preg_replace('/\s/', '', $envio["telefono"]);
+        if (!preg_match('/^[0-9]{9}$/', $envio["telefono"])) {
+            $errores[] = "El teléfono debe tener 9 dígitos, con formato 099 999 999.";
+        }
+        return $errores;
+    }
+
+    private function largoEntre($texto, $minimo, $maximo) {
+        $largo = mb_strlen($texto, "UTF-8");
+        return $largo >= $minimo && $largo <= $maximo;
     }
 
     public function ver() {

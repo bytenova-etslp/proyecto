@@ -4,10 +4,10 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?php echo htmlspecialchars($tituloPagina); ?></title>
-	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/style.css?v=14c">
 	<link rel="shortcut icon" type="image/png" href="imagenes/favicon.png">
     <?php if (isset($estiloExtra)): ?>
-        <link rel="stylesheet" href="<?php echo escapar($estiloExtra); ?>">
+        <link rel="stylesheet" href="<?php echo escapar($estiloExtra); ?>?v=14c">
     <?php endif; ?>
 </head>
 <body>
@@ -18,14 +18,11 @@
 				<li><a href="index.php" <?php if ($seccionActiva === "inicio") echo 'class="activo"'; ?>>Inicio</a></li>
 				<li><a href="index.php?pagina=productos" <?php if ($seccionActiva === "productos") echo 'class="activo"'; ?>>Productos</a></li>
 				<li><a href="index.php?pagina=carrito" <?php if ($seccionActiva === "carrito") echo 'class="activo"'; ?>>Carrito <span id="contador-carrito" class="contador-carrito">0</span></a></li>
-                <?php if (puedeGestionarProductos()): ?>
-                    <li><a href="index.php?pagina=admin_productos" <?php if ($seccionActiva === "gestion_productos") echo 'class="activo"'; ?>>Gestionar productos</a></li>
-                <?php endif; ?>
                 <?php if (usuarioActualRol() === "cliente"): ?>
                     <li><a href="index.php?pagina=mis_pedidos" <?php if ($seccionActiva === "mis_pedidos") echo 'class="activo"'; ?>>Mis pedidos</a></li>
                 <?php endif; ?>
-				<?php if (esAdmin()): ?>
-					<li><a href="index.php?pagina=admin" <?php if ($seccionActiva === "admin") echo 'class="activo"'; ?>>Administración</a></li>
+				<?php if (puedeGestionarProductos()): ?>
+					<li><a href="index.php?pagina=admin" <?php if (in_array($seccionActiva, ["admin", "gestion_productos", "gestion_pedidos"], true)) echo 'class="activo"'; ?>>Administración</a></li>
 				<?php endif; ?>
 				<?php if (estaLogueado()): ?>
 					<li><span>Hola, <?php echo escapar(usuarioActualNombre()); ?></span></li>

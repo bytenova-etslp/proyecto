@@ -58,3 +58,63 @@
 .form-admin small { display: block; margin-top: 6px; }
 .form-admin .tabla input { min-width: 100px; }
 .form-admin input[readonly] { background: #eef0f4; }
+
+.filtros-pedidos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0;
+}
+.filtros-pedidos select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font: inherit;
+    background: #fff;
+}
+.pedidos-gestion .tabla caption {
+    text-align: left;
+    font-weight: 600;
+    padding: 12px 0;
+}
+.pedidos-gestion .tabla td { vertical-align: top; }
+.correo-pedido { overflow-wrap: anywhere; min-width: 180px; max-width: 280px; }
+.importe-pedido { white-space: nowrap; }
+.envio-pedido { min-width: 210px; max-width: 320px; }
+.pedidos-gestion address {
+    display: grid;
+    gap: 5px;
+    font-style: normal;
+    overflow-wrap: anywhere;
+}
+.estado-pedido {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: #eef0f4;
+    font-size: .9rem;
+    font-weight: 600;
+}
+.estado-pedido[data-estado="pagado"] { background: #e4f4e9; color: #22633b; }
+.estado-pedido[data-estado="rechazado"] { background: #fff0f2; color: #9f1732; }
+.estado-pedido[data-estado="pendiente"] { background: #fff3d6; color: #77530c; }
+.resumen-pedido-gestion {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin: 24px 0;
+}
+.resumen-pedido-gestion > section {
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow-wrap: anywhere;
+}
+.resumen-pedido-gestion h2, .resumen-pedido-gestion h3 { font-size: 1.15rem; margin-bottom: 12px; }
+.resumen-pedido-gestion p, .pedidos-gestion > p { margin: 10px 0; }
+.total-pedido-gestion { font-size: 1.3rem; font-weight: 700; }
+@media (max-width: 650px) {
+    .resumen-pedido-gestion { grid-template-columns: minmax(0, 1fr); }
+}
