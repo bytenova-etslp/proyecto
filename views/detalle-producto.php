@@ -25,12 +25,13 @@ require __DIR__ . "/header.php";
 
 					<div class="seleccion-talle detalle-talle">
 						<label for="talle-detalle">Talle</label>
-						<select id="talle-detalle" class="selector-talle" data-producto-id="<?php echo $producto["id_producto"]; ?>">
+						<select id="talle-detalle" class="selector-talle" data-producto-id="<?php echo escapar($producto["id_producto"]); ?>">
+							<?php $seleccionInicialDefinida = false; ?>
 							<?php foreach ($talles as $filaTalle): ?>
-								<option value="<?php echo htmlspecialchars($filaTalle["talle"]); ?>" data-stock="<?php echo (int)$filaTalle["stock"]; ?>" <?php if ($filaTalle["stock"] <= 0) echo "disabled"; ?>>
+								<option value="<?php echo htmlspecialchars($filaTalle["talle"]); ?>" data-stock="<?php echo (int)$filaTalle["stock"]; ?>" <?php if ($filaTalle["stock"] <= 0) { echo "disabled"; } elseif (!$seleccionInicialDefinida) { echo "selected"; $seleccionInicialDefinida = true; } ?>>
 								    <?php echo htmlspecialchars($filaTalle["talle"]); ?>
 								    <?php if ($filaTalle["stock"] > 0): ?>
-								        (<?php echo $filaTalle["stock"]; ?> disponibles)
+								        (<?php echo escapar($filaTalle["stock"]); ?> disponibles)
 								    <?php else: ?>
 								        (agotado)
 								    <?php endif; ?>
@@ -43,9 +44,9 @@ require __DIR__ . "/header.php";
 						<button
 							type="button"
 							class="btn btn-agregar-producto"
-							data-id="<?php echo $producto["id_producto"]; ?>"
+							data-id="<?php echo escapar($producto["id_producto"]); ?>"
 							data-nombre="<?php echo htmlspecialchars($producto["nombre"]); ?>"
-							data-precio="<?php echo $precioCarrito; ?>"
+							data-precio="<?php echo escapar($precioCarrito); ?>"
 							<?php if ($producto["stock"] <= 0) echo "disabled"; ?>
 						>Agregar al Carrito</button>
 						<a href="index.php?pagina=productos" class="btn btn-secundario">Volver al catálogo</a>

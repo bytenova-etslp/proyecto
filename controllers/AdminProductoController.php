@@ -4,6 +4,7 @@ require_once __DIR__ . "/../config/imagenes.php";
 
 class AdminProductoController {
     private $productoModel;
+    private $tallesFijos = ["XS", "S", "M", "L", "XL", "XXL"];
 
     public function __construct($conexion) {
         requerirRol(["empleado", "administrador"]);
@@ -31,7 +32,6 @@ class AdminProductoController {
     public function crear() {
         $producto = $this->productoVacio();
         $errores = [];
-        $tallesProtegidos = [];
         $categorias = $this->productoModel->listarCategorias();
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $producto = $this->leerFormulario();
@@ -63,11 +63,11 @@ class AdminProductoController {
             redirigir("admin_productos", "&msg=no_existe");
         }
         $producto = $actual;
+        $producto["talles"] = $this->prepararTalles($actual["talles"]);
         $errores = [];
-        $tallesProtegidos = array_column($actual["talles"], "talle");
         $categorias = $this->productoModel->listarCategorias();
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $producto = $this->leerFormulario();
+            $producto = $this->leerFormulario($actual["talles"]);
             $producto["imagen"] = $actual["imagen"];
             $errores = $this->validar($producto, $categorias, $actual["talles"]);
             if (empty($errores)) {
@@ -126,14 +126,31 @@ class AdminProductoController {
         return [
             "nombre" => "", "descripcion" => "", "precio" => "", "imagen" => "",
             "stock_minimo" => "5", "id_categoria" => "", "datos_validos" => true,
-            "talles" => [
-                ["talle" => "S", "stock" => "0"], ["talle" => "M", "stock" => "0"],
-                ["talle" => "L", "stock" => "0"], ["talle" => "XL", "stock" => "0"]
-            ]
+            "talles" => $this->prepararTalles()
         ];
     }
 
-    private function leerFormulario() {
+    private function prepararTalles($actuales = []) {
+        $porNombre = [];
+        foreach ($actuales as $fila) {
+            $porNombre[strtoupper($fila["talle"])] = $fila;
+        }
+        $filas = [];
+        foreach ($this->tallesFijos as $nombre) {
+            $fila = $porNombre[$nombre] ?? ["talle" => $nombre, "stock" => "0"];
+            $fila["es_fijo"] = true;
+            $filas[] = $fila;
+            unset($porNombre[$nombre]);
+        }
+        // Se conservan nombres y existencias de talles previos, sin renombrar claves.
+        foreach ($porNombre as $fila) {
+            $fila["es_fijo"] = false;
+            $filas[] = $fila;
+        }
+        return $filas;
+    }
+
+    private function leerFormulario($tallesActuales = []) {
         $producto = $this->productoVacio();
         foreach (["nombre", "descripcion", "precio", "stock_minimo", "id_categoria"] as $campo) {
             $valor = $_POST[$campo] ?? "";
@@ -145,22 +162,29 @@ class AdminProductoController {
         }
         $nombres = $_POST["talles"] ?? [];
         $stocks = $_POST["stocks"] ?? [];
-        $producto["talles"] = [];
-        if (!is_array($nombres) || !is_array($stocks) || count($nombres) !== count($stocks)) {
+        $producto["talles"] = $this->prepararTalles($tallesActuales);
+        $permitidos = array_column($producto["talles"], "talle");
+        if (!is_array($nombres) || !is_array($stocks) || count($nombres) !== count($stocks)
+            || count($nombres) !== count($permitidos)) {
             $producto["datos_validos"] = false;
             return $producto;
         }
         $nombres = array_values($nombres);
         $stocks = array_values($stocks);
+        $recibidos = [];
         foreach ($nombres as $indice => $nombre) {
-            if (!is_string($nombre) || !is_string($stocks[$indice])) {
+            if (!is_string($nombre) || !is_string($stocks[$indice])
+                || !in_array($nombre, $permitidos, true) || array_key_exists($nombre, $recibidos)) {
                 $producto["datos_validos"] = false;
                 continue;
             }
-            $nombre = trim($nombre);
-            $stock = trim($stocks[$indice]);
-            if ($nombre !== "" || $stock !== "") {
-                $producto["talles"][] = ["talle" => $nombre, "stock" => $stock];
+            $recibidos[$nombre] = trim($stocks[$indice]);
+        }
+        foreach ($producto["talles"] as $indice => $fila) {
+            if (!array_key_exists($fila["talle"], $recibidos)) {
+                $producto["datos_validos"] = false;
+            } else {
+                $producto["talles"][$indice]["stock"] = $recibidos[$fila["talle"]];
             }
         }
         return $producto;
@@ -190,7 +214,7 @@ class AdminProductoController {
             $errores[] = "El stock mínimo debe ser un entero entre 0 y 2147483647.";
         }
         if (empty($producto["talles"])) {
-            $errores[] = "Agregá al menos un talle con su stock.";
+            $errores[] = "Completá las existencias de los talles del producto.";
         }
         $nombres = [];
         foreach ($producto["talles"] as $fila) {

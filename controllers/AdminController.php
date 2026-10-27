@@ -11,12 +11,6 @@ class AdminController {
 
     public function panel() {
         $nombreAdmin = usuarioActualNombre();
-        // El empleado usa los accesos del panel. El resumen y las alertas
-        // siguen reservados al administrador.
-        if (!esAdmin()) {
-            require __DIR__ . "/../views/admin.php";
-            return;
-        }
         $productos = $this->productoModel->listarProductos();
         $cantidadProductos = count($productos);
         $unidadesDisponibles = 0;

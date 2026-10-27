@@ -79,7 +79,9 @@ class ProductoModel {
     }
 
     public function listarTalles($idProducto) {
-        $consulta = $this->conexion->prepare("SELECT talle, stock FROM Producto_Talle WHERE id_producto = ? ORDER BY stock DESC, talle ASC");
+        $consulta = $this->conexion->prepare("SELECT talle, stock FROM Producto_Talle WHERE id_producto = ?
+            ORDER BY CASE talle WHEN 'XS' THEN 1 WHEN 'S' THEN 2 WHEN 'M' THEN 3
+                WHEN 'L' THEN 4 WHEN 'XL' THEN 5 WHEN 'XXL' THEN 6 ELSE 7 END, talle ASC");
         $consulta->bind_param("i", $idProducto);
         $consulta->execute();
         $resultado = $consulta->get_result();

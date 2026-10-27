@@ -45,23 +45,24 @@ require __DIR__ . "/../header.php";
 
         <fieldset>
             <legend>Stock por talle</legend>
-            <p>Los talles existentes se conservan. Indicá 0 unidades cuando un talle esté agotado.</p>
+            <p>Modificá las unidades de XS, S, M, L, XL y XXL. Indicá 0 si un talle está agotado.</p>
             <div class="contenedor-tabla">
                 <table class="tabla">
-                    <thead><tr><th>Talle</th><th>Unidades</th><th>Acción</th></tr></thead>
-                    <tbody id="filas-talles">
+                    <thead><tr><th>Talle</th><th>Unidades</th></tr></thead>
+                    <tbody>
                         <?php foreach ($producto["talles"] as $fila): ?>
-                            <?php $protegido = in_array($fila["talle"], $tallesProtegidos, true); ?>
                             <tr>
-                                <td><input type="text" name="talles[]" maxlength="10" value="<?php echo escapar($fila["talle"]); ?>" aria-label="Talle" <?php if ($protegido) echo "readonly"; ?>></td>
-                                <td><input type="number" name="stocks[]" min="0" max="2147483647" step="1" value="<?php echo escapar($fila["stock"]); ?>" aria-label="Unidades del talle"></td>
-                                <td><?php if (!$protegido): ?><button type="button" class="btn btn-secundario btn-quitar-talle">Quitar fila</button><?php else: ?>Talle registrado<?php endif; ?></td>
+                                <td>
+                                    <?php echo escapar($fila["talle"]); ?>
+                                    <input type="hidden" name="talles[]" value="<?php echo escapar($fila["talle"]); ?>">
+                                    <?php if (!$fila["es_fijo"]): ?><small>Registrado anteriormente</small><?php endif; ?>
+                                </td>
+                                <td><input type="number" name="stocks[]" min="0" max="2147483647" step="1" value="<?php echo escapar($fila["stock"]); ?>" aria-label="Unidades del talle <?php echo escapar($fila["talle"]); ?>" required></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
-            <button type="button" id="btn-agregar-talle" class="btn btn-secundario">Agregar talle</button>
         </fieldset>
 
         <?php if (!empty($producto["imagen"])): ?>
@@ -80,6 +81,5 @@ require __DIR__ . "/../header.php";
     </form>
 </main>
 <?php
-$scriptExtra = "js/admin-productos.js";
 require __DIR__ . "/../footer.php";
 ?>

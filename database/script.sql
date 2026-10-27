@@ -120,3 +120,15 @@ INSERT INTO Promocion_Producto (id_promocion, id_producto, precio_promocional)
 VALUES
 (1, 3, 1590.00),
 (1, 5, 2190.00);
+
+-- Completar talles fijos sin modificar existencias previas.
+INSERT INTO Producto_Talle (id_producto, talle, stock)
+SELECT Producto.id_producto, talles.talle, 0
+FROM Producto
+CROSS JOIN (
+    SELECT 'XS' AS talle UNION ALL SELECT 'S' UNION ALL SELECT 'M'
+    UNION ALL SELECT 'L' UNION ALL SELECT 'XL' UNION ALL SELECT 'XXL'
+) AS talles
+LEFT JOIN Producto_Talle AS existente
+    ON existente.id_producto = Producto.id_producto AND existente.talle = talles.talle
+WHERE existente.id_producto IS NULL;

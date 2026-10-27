@@ -13,7 +13,6 @@ require __DIR__ . "/header.php";
         <a href="index.php?pagina=admin_pedidos" class="btn">Pedidos recibidos</a>
     </p>
 
-    <?php if (esAdmin()): ?>
     <section class="tarjetas" aria-label="Resumen del catálogo">
         <article class="tarjeta">
             <h2>Productos activos</h2>
@@ -57,6 +56,5 @@ require __DIR__ . "/header.php";
             </div>
         <?php endif; ?>
     </section>
-    <?php endif; ?>
 </main>
 <?php require __DIR__ . "/footer.php"; ?>

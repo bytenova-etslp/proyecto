@@ -65,13 +65,14 @@ require __DIR__ . "/header.php";
 								<?php endif; ?>
 
 								<div class="seleccion-talle">
-									<label for="talle-<?php echo $producto["id_producto"]; ?>">Talle</label>
-									<select id="talle-<?php echo $producto["id_producto"]; ?>" class="selector-talle" data-producto-id="<?php echo $producto["id_producto"]; ?>">
+									<label for="talle-<?php echo escapar($producto["id_producto"]); ?>">Talle</label>
+									<select id="talle-<?php echo escapar($producto["id_producto"]); ?>" class="selector-talle" data-producto-id="<?php echo escapar($producto["id_producto"]); ?>">
+										<?php $seleccionInicialDefinida = false; ?>
 										<?php foreach ($producto["talles"] as $filaTalle): ?>
-											<option value="<?php echo htmlspecialchars($filaTalle["talle"]); ?>" data-stock="<?php echo (int)$filaTalle["stock"]; ?>" <?php if ($filaTalle["stock"] <= 0) echo "disabled"; ?>>
+											<option value="<?php echo htmlspecialchars($filaTalle["talle"]); ?>" data-stock="<?php echo (int)$filaTalle["stock"]; ?>" <?php if ($filaTalle["stock"] <= 0) { echo "disabled"; } elseif (!$seleccionInicialDefinida) { echo "selected"; $seleccionInicialDefinida = true; } ?>>
 											    <?php echo htmlspecialchars($filaTalle["talle"]); ?>
 											    <?php if ($filaTalle["stock"] > 0): ?>
-											        (<?php echo $filaTalle["stock"]; ?> disponibles)
+											        (<?php echo escapar($filaTalle["stock"]); ?> disponibles)
 											    <?php else: ?>
 											        (agotado)
 											    <?php endif; ?>
@@ -81,13 +82,13 @@ require __DIR__ . "/header.php";
 								</div>
 
 								<div class="botones-producto">
-									<a href="index.php?pagina=producto&id=<?php echo $producto["id_producto"]; ?>" class="btn btn-secundario">Ver detalle</a>
+									<a href="index.php?pagina=producto&id=<?php echo escapar($producto["id_producto"]); ?>" class="btn btn-secundario">Ver detalle</a>
 									<button
 										type="button"
 										class="btn btn-agregar-producto"
-										data-id="<?php echo $producto["id_producto"]; ?>"
+										data-id="<?php echo escapar($producto["id_producto"]); ?>"
 										data-nombre="<?php echo htmlspecialchars($producto["nombre"]); ?>"
-										data-precio="<?php echo $producto["precio_carrito"]; ?>"
+										data-precio="<?php echo escapar($producto["precio_carrito"]); ?>"
 										<?php if ($producto["stock"] <= 0) echo "disabled"; ?>
 									>Agregar al Carrito</button>
 								</div>

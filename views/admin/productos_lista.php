@@ -8,9 +8,7 @@ require __DIR__ . "/../header.php";
     <h1 class="titulo-seccion">Gestión de productos</h1>
     <div class="acciones-admin">
         <a href="index.php?pagina=admin_producto_crear" class="btn">Nuevo producto</a>
-        <?php if (esAdmin()): ?>
-            <a href="index.php?pagina=admin" class="btn btn-secundario">Volver al panel</a>
-        <?php endif; ?>
+        <a href="index.php?pagina=admin" class="btn btn-secundario">Volver al panel</a>
         <a href="index.php?pagina=productos" class="btn btn-secundario">Ver catálogo</a>
     </div>
     <?php if ($aviso !== ""): ?>
