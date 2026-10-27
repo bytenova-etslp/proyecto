@@ -4,10 +4,10 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?php echo htmlspecialchars($tituloPagina); ?></title>
-	<link rel="stylesheet" href="css/style.css?v=14c">
+	<link rel="stylesheet" href="css/style.css?v=15">
 	<link rel="shortcut icon" type="image/png" href="imagenes/favicon.png">
     <?php if (isset($estiloExtra)): ?>
-        <link rel="stylesheet" href="<?php echo escapar($estiloExtra); ?>?v=14c">
+        <link rel="stylesheet" href="<?php echo escapar($estiloExtra); ?>?v=15">
     <?php endif; ?>
 </head>
 <body>
@@ -22,7 +22,7 @@
                     <li><a href="index.php?pagina=mis_pedidos" <?php if ($seccionActiva === "mis_pedidos") echo 'class="activo"'; ?>>Mis pedidos</a></li>
                 <?php endif; ?>
 				<?php if (puedeGestionarProductos()): ?>
-					<li><a href="index.php?pagina=admin" <?php if (in_array($seccionActiva, ["admin", "gestion_productos", "gestion_pedidos"], true)) echo 'class="activo"'; ?>>Administración</a></li>
+					<li><a href="index.php?pagina=admin" <?php if (in_array($seccionActiva, ["admin", "gestion_productos", "gestion_pedidos", "gestion_usuarios"], true)) echo 'class="activo"'; ?>>Administración</a></li>
 				<?php endif; ?>
 				<?php if (estaLogueado()): ?>
 					<li><span>Hola, <?php echo escapar(usuarioActualNombre()); ?></span></li>

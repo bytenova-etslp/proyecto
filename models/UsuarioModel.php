@@ -40,4 +40,39 @@ class UsuarioModel {
         mysqli_stmt_close($consulta);
         return $usuario;
     }
+
+    // El panel nunca consulta contrasenas ni hashes.
+    public function listarTodosAdmin() {
+        $sql = "SELECT u.id_usuario, u.nombre, u.email, u.rol, u.activo,
+                       COUNT(p.id_pedido) AS cantidad_pedidos
+                FROM Usuario u
+                LEFT JOIN Pedido p ON p.id_usuario = u.id_usuario
+                GROUP BY u.id_usuario, u.nombre, u.email, u.rol, u.activo
+                ORDER BY u.activo DESC, u.nombre ASC, u.id_usuario ASC";
+        $consulta = mysqli_prepare($this->conexion, $sql);
+        mysqli_stmt_execute($consulta);
+        $resultado = mysqli_stmt_get_result($consulta);
+        $usuarios = [];
+        while ($usuario = mysqli_fetch_assoc($resultado)) {
+            $usuarios[] = $usuario;
+        }
+        mysqli_stmt_close($consulta);
+        return $usuarios;
+    }
+
+    public function cambiarRol($idUsuario, $rol) {
+        $consulta = mysqli_prepare($this->conexion, "UPDATE Usuario SET rol = ? WHERE id_usuario = ?");
+        mysqli_stmt_bind_param($consulta, "si", $rol, $idUsuario);
+        $guardado = mysqli_stmt_execute($consulta);
+        mysqli_stmt_close($consulta);
+        return $guardado;
+    }
+
+    public function cambiarActivo($idUsuario, $activo) {
+        $consulta = mysqli_prepare($this->conexion, "UPDATE Usuario SET activo = ? WHERE id_usuario = ?");
+        mysqli_stmt_bind_param($consulta, "ii", $activo, $idUsuario);
+        $guardado = mysqli_stmt_execute($consulta);
+        mysqli_stmt_close($consulta);
+        return $guardado;
+    }
 }

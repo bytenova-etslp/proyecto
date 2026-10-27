@@ -8,6 +8,7 @@ require_once __DIR__ . "/controllers/AdminController.php";
 require_once __DIR__ . "/controllers/AdminProductoController.php";
 require_once __DIR__ . "/controllers/PedidoController.php";
 require_once __DIR__ . "/controllers/AdminPedidoController.php";
+require_once __DIR__ . "/controllers/AdminUsuarioController.php";
 
 // Los cambios de rol o de estado se aplican tambien a sesiones ya abiertas.
 if (estaLogueado()) {
@@ -92,6 +93,35 @@ switch ($paginaSolicitada) {
         } catch (mysqli_sql_exception $error) {
             http_response_code(500);
             $mensajeError = "No se pudo acceder a los productos. Intenta nuevamente.";
+            require __DIR__ . "/views/error.php";
+        }
+        break;
+
+    case "admin_usuarios":
+    case "admin_usuario_rol":
+    case "admin_usuario_estado":
+        requerirRol("administrador");
+        $metodoPermitido = $paginaSolicitada === "admin_usuarios" ? "GET" : "POST";
+        if ($_SERVER["REQUEST_METHOD"] !== $metodoPermitido) {
+            header("Allow: " . $metodoPermitido);
+            http_response_code(405);
+            $mensajeError = "Método no permitido.";
+            require __DIR__ . "/views/error.php";
+            break;
+        }
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            require_once __DIR__ . "/php/conexion.php";
+            mysqli_set_charset($conexion, "utf8mb4");
+            $controlador = new AdminUsuarioController($conexion);
+            switch ($paginaSolicitada) {
+                case "admin_usuarios": $controlador->listar(); break;
+                case "admin_usuario_rol": $controlador->cambiarRol(); break;
+                case "admin_usuario_estado": $controlador->cambiarEstado(); break;
+            }
+        } catch (mysqli_sql_exception $error) {
+            http_response_code(500);
+            $mensajeError = "No se pudo completar la operación. Volvé a consultar los usuarios antes de intentarlo nuevamente.";
             require __DIR__ . "/views/error.php";
         }
         break;

@@ -11,6 +11,9 @@ require __DIR__ . "/header.php";
     <p class="acciones-admin">
         <a href="index.php?pagina=admin_productos" class="btn">Gestionar productos</a>
         <a href="index.php?pagina=admin_pedidos" class="btn">Pedidos recibidos</a>
+        <?php if (esAdmin()): ?>
+            <a href="index.php?pagina=admin_usuarios" class="btn">Gestionar usuarios</a>
+        <?php endif; ?>
     </p>
 
     <section class="tarjetas" aria-label="Resumen del catálogo">
