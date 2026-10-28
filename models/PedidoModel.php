@@ -33,7 +33,7 @@ class PedidoModel {
                 if ((int)$variante["stock"] < $item["cantidad"]) {
                     throw new InvalidArgumentException("No hay stock suficiente para uno de los talles. Revisa las cantidades del carrito.");
                 }
-                $precio = $variante["precio_promocional"] !== null ? $variante["precio_promocional"] : $variante["precio"];
+                $precio = $variante["precio"];
                 $this->descontarStock($item["id"], $variante["talle"], $item["cantidad"]);
                 $this->agregarDetalle($idPedido, $item["id"], $variante["talle"], $item["cantidad"], $precio);
             }
@@ -63,7 +63,7 @@ class PedidoModel {
             if ((int)$variante["stock"] < $item["cantidad"]) {
                 throw new InvalidArgumentException("No hay stock suficiente para uno de los talles. Revisá las cantidades del carrito.");
             }
-            $precio = $variante["precio_promocional"] ?? $variante["precio"];
+            $precio = $variante["precio"];
             $subtotal = (float)$precio * $item["cantidad"];
             $lineas[] = ["id" => $item["id"], "nombre" => $variante["nombre"], "talle" => $variante["talle"],
                 "cantidad" => $item["cantidad"], "precio" => $precio, "subtotal" => $subtotal];
@@ -73,14 +73,7 @@ class PedidoModel {
     }
 
     private function obtenerVarianteParaCompra($idProducto, $talle) {
-        $consulta = $this->conexion->prepare("SELECT Producto.nombre, Producto.precio, Producto_Talle.talle, Producto_Talle.stock,
-            (SELECT MIN(Promocion_Producto.precio_promocional)
-             FROM Promocion_Producto
-             JOIN Promocion ON Promocion.id_promocion = Promocion_Producto.id_promocion
-             WHERE Promocion_Producto.id_producto = Producto.id_producto
-                 AND Promocion.activo = 1
-                 AND Promocion_Producto.precio_promocional < Producto.precio
-                 AND CURRENT_DATE BETWEEN Promocion.fecha_inicio AND Promocion.fecha_fin) AS precio_promocional
+        $consulta = $this->conexion->prepare("SELECT Producto.nombre, Producto.precio, Producto_Talle.talle, Producto_Talle.stock
             FROM Producto JOIN Producto_Talle ON Producto_Talle.id_producto = Producto.id_producto
             WHERE Producto.id_producto = ? AND Producto.activo = 1 AND Producto_Talle.talle = ?");
         $consulta->bind_param("is", $idProducto, $talle);

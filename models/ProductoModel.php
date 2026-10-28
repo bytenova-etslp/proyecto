@@ -9,14 +9,6 @@ class ProductoModel {
 
     public function listarProductos($idCategoria = null, $busqueda = "") {
         $sql = "SELECT Producto.id_producto, Producto.nombre, Producto.precio, Producto.stock_minimo,
-		(SELECT MIN(Promocion_Producto.precio_promocional)
-            FROM Promocion_Producto
-            JOIN Promocion ON Promocion_Producto.id_promocion = Promocion.id_promocion
-            WHERE Promocion_Producto.id_producto = Producto.id_producto
-                AND Promocion.activo = 1
-                AND Promocion_Producto.precio_promocional < Producto.precio
-                AND CURRENT_DATE BETWEEN Promocion.fecha_inicio AND Promocion.fecha_fin)
-            AS precio_promocional,
 		Producto.imagen, COALESCE((SELECT SUM(Producto_Talle.stock)
             FROM Producto_Talle
             WHERE Producto_Talle.id_producto = Producto.id_producto), 0) AS stock, Categoria.nombre AS categoria
@@ -54,14 +46,7 @@ class ProductoModel {
 
     public function obtenerProductoPorId($idProducto) {
         $sql = "SELECT Producto.id_producto, Producto.nombre, Producto.descripcion, Producto.precio,
-		(SELECT MIN(Promocion_Producto.precio_promocional)
-            FROM Promocion_Producto
-            JOIN Promocion ON Promocion_Producto.id_promocion = Promocion.id_promocion
-            WHERE Promocion_Producto.id_producto = Producto.id_producto
-                AND Promocion.activo = 1
-                AND Promocion_Producto.precio_promocional < Producto.precio
-                AND CURRENT_DATE BETWEEN Promocion.fecha_inicio AND Promocion.fecha_fin)
-            AS precio_promocional, Producto.imagen,
+		Producto.imagen,
         COALESCE((SELECT SUM(Producto_Talle.stock)
             FROM Producto_Talle
             WHERE Producto_Talle.id_producto = Producto.id_producto), 0) AS stock,

@@ -58,11 +58,7 @@ require __DIR__ . "/header.php";
 								<div class="categoria-producto"><?php echo htmlspecialchars($producto["categoria"]); ?></div>
 								<h3 class="titulo-producto"><?php echo htmlspecialchars($producto["nombre"]); ?></h3>
 
-								<?php if ($producto["precio_promocional"] != null): ?>
-									<div class="precio-producto">$ <?php echo number_format($producto["precio_promocional"], 0, ",", "."); ?></div>
-								<?php else: ?>
-									<div class="precio-producto">$ <?php echo number_format($producto["precio"], 0, ",", "."); ?></div>
-								<?php endif; ?>
+								<div class="precio-producto">$ <?php echo escapar(number_format((float)$producto["precio"], 2, ",", ".")); ?></div>
 
 								<div class="seleccion-talle">
 									<label for="talle-<?php echo escapar($producto["id_producto"]); ?>">Talle</label>

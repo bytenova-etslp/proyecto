@@ -39,7 +39,6 @@ require __DIR__ . "/../header.php";
     <?php if ($pedido["estado"] === "pagado"): ?>
         <p class="acciones-admin">
             <a class="btn" href="index.php?pagina=admin_pedido_factura&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>">Ver factura</a>
-            <a class="btn btn-secundario" href="index.php?pagina=admin_pedido_factura_pdf&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>">Descargar PDF</a>
         </p>
     <?php endif; ?>
     <?php require __DIR__ . "/../cancelar_pedido.php"; ?>

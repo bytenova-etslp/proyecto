@@ -46,7 +46,7 @@ class ProductoController {
         }
         foreach ($productos as $indice => $producto) {
             $productos[$indice]["talles"] = $this->productoModel->listarTalles($producto["id_producto"]);
-            $productos[$indice]["precio_carrito"] = $producto["precio_promocional"] ?? $producto["precio"];
+            $productos[$indice]["precio_carrito"] = $producto["precio"];
         }
         require __DIR__ . "/../views/productos.php";
     }
@@ -62,7 +62,7 @@ class ProductoController {
         }
         if ($producto) {
             $talles = $this->productoModel->listarTalles($id);
-            $precioCarrito = $producto["precio_promocional"] ?? $producto["precio"];
+            $precioCarrito = $producto["precio"];
         } else {
             http_response_code(404);
         }

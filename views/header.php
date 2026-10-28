@@ -4,10 +4,10 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?php echo htmlspecialchars($tituloPagina); ?></title>
-	<link rel="stylesheet" href="css/style.css?v=16b">
+	<link rel="stylesheet" href="css/style.css?v=17c">
 	<link rel="shortcut icon" type="image/png" href="imagenes/favicon.png">
     <?php if (isset($estiloExtra)): ?>
-        <link rel="stylesheet" href="<?php echo escapar($estiloExtra); ?>?v=16b">
+        <link rel="stylesheet" href="<?php echo escapar($estiloExtra); ?>?v=17c">
     <?php endif; ?>
 </head>
 <body>

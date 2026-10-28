@@ -2,7 +2,7 @@
 require_once __DIR__ . "/../models/PedidoModel.php";
 require_once __DIR__ . "/../models/PagoModel.php";
 
-// Una misma factura HTML/PDF, con permisos distintos para cliente y personal.
+// Factura HTML con datos de la base y permisos distintos para cliente y personal.
 class FacturaController {
     private $pedidoModel;
     private $pagoModel;
@@ -15,7 +15,7 @@ class FacturaController {
         $this->pagoModel = new PagoModel($conexion);
     }
 
-    public function mostrar($descargar = false) {
+    public function mostrar() {
         if ($_SERVER["REQUEST_METHOD"] !== "GET") {
             header("Allow: GET");
             $this->error(405, "Método no permitido.");
@@ -53,20 +53,9 @@ class FacturaController {
         }
         $factura = ["numero" => str_pad((string)$id, 6, "0", STR_PAD_LEFT),
             "pedido" => $pedido, "pago" => $pago, "detalle" => $detalle, "total_centavos" => $totalCentavos];
-        // El PDF se entrega en memoria. No se deja un archivo publico por pedido.
+        // El documento contiene datos personales y no debe quedar en cache.
         header("Cache-Control: private, no-store, max-age=0");
         header("X-Content-Type-Options: nosniff");
-        if ($descargar) {
-            require_once __DIR__ . "/../views/pdf/FacturaPdf.php";
-            $contenido = FacturaPdf::generar($factura);
-            header("Content-Type: application/pdf");
-            header('Content-Disposition: attachment; filename="factura-' . $factura["numero"] . '.pdf"');
-            header("Content-Length: " . strlen($contenido));
-            echo $contenido;
-            return;
-        }
-        $rutaFactura = $this->paraPersonal ? "admin_pedido_factura" : "factura";
-        $urlPdf = "index.php?pagina=" . $rutaFactura . "_pdf&id=" . $id;
         $urlVolver = "index.php?pagina=" . ($this->paraPersonal ? "admin_pedido" : "pedido") . "&id=" . $id;
         require __DIR__ . "/../views/factura.php";
     }

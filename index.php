@@ -181,10 +181,8 @@ switch ($paginaSolicitada) {
 
     case "admin_informe":
     case "factura":
-    case "factura_pdf":
     case "admin_pedido_factura":
-    case "admin_pedido_factura_pdf":
-        $esPersonal = in_array($paginaSolicitada, ["admin_informe", "admin_pedido_factura", "admin_pedido_factura_pdf"], true);
+        $esPersonal = in_array($paginaSolicitada, ["admin_informe", "admin_pedido_factura"], true);
         requerirRol($esPersonal ? ["empleado", "administrador"] : "cliente");
         if ($_SERVER["REQUEST_METHOD"] !== "GET") {
             header("Allow: GET");
@@ -200,8 +198,7 @@ switch ($paginaSolicitada) {
             if ($paginaSolicitada === "admin_informe") {
                 (new InformeController($conexion))->mostrar();
             } else {
-                $descargar = in_array($paginaSolicitada, ["factura_pdf", "admin_pedido_factura_pdf"], true);
-                (new FacturaController($conexion, $esPersonal))->mostrar($descargar);
+                (new FacturaController($conexion, $esPersonal))->mostrar();
             }
         } catch (mysqli_sql_exception $error) {
             http_response_code(500);

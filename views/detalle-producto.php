@@ -15,11 +15,7 @@ require __DIR__ . "/header.php";
 					<p class="categoria-producto"><?php echo htmlspecialchars($producto["categoria"]); ?></p>
 					<h1><?php echo htmlspecialchars($producto["nombre"]); ?></h1>
 
-					<?php if ($producto["precio_promocional"] != null): ?>
-						<p class="detalle-precio">$ <?php echo number_format($producto["precio_promocional"], 0, ",", "."); ?></p>
-					<?php else: ?>
-						<p class="detalle-precio">$ <?php echo number_format($producto["precio"], 0, ",", "."); ?></p>
-					<?php endif; ?>
+					<p class="detalle-precio">$ <?php echo escapar(number_format((float)$producto["precio"], 2, ",", ".")); ?></p>
 
 					<p class="detalle-descripcion"><?php echo htmlspecialchars($producto["descripcion"]); ?></p>
 

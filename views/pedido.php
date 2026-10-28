@@ -33,7 +33,6 @@ require __DIR__ . "/header.php";
         <p>Los importes corresponden a los precios vigentes al registrar el pedido.</p>
         <?php if ($pedido["estado"] === "pagado"): ?>
             <a class="btn" href="index.php?pagina=factura&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>">Ver factura</a>
-            <a class="btn btn-secundario" href="index.php?pagina=factura_pdf&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>">Descargar PDF</a>
         <?php endif; ?>
         <?php if (in_array($pedido["estado"], ["pendiente", "rechazado"], true)): ?>
             <a class="btn" href="index.php?pagina=pago&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>"><?php echo $pedido["estado"] === "rechazado" ? "Reintentar pago" : "Pagar con tarjeta"; ?></a>

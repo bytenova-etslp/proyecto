@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Factura <?php echo escapar($factura["numero"]); ?> - Punto Moda</title>
-    <link rel="stylesheet" href="css/factura.css?v=16">
+    <link rel="stylesheet" href="css/factura.css?v=17">
 </head>
 <body>
     <nav class="barra-factura" aria-label="Acciones de la factura">
-        <a class="boton-factura" href="<?php echo escapar($urlPdf); ?>">Descargar PDF</a>
-        <button class="boton-factura secundario" type="button" id="imprimir-factura">Imprimir</button>
+        <button class="boton-factura" type="button" id="imprimir-factura">Imprimir / Guardar PDF</button>
         <a class="volver-factura" href="<?php echo escapar($urlVolver); ?>">Volver al pedido</a>
+        <p class="ayuda-impresion">En la ventana de impresión podés elegir Guardar como PDF.</p>
     </nav>
     <main class="hoja-factura">
         <header class="cabecera-factura">
@@ -62,6 +62,6 @@
         <div class="total-factura"><span>Total pagado</span><strong>$<?php echo escapar(number_format($factura["total_centavos"] / 100, 2, ",", ".")); ?></strong></div>
         <footer class="pie-factura"><p>Importes expresados en pesos uruguayos (UYU).</p><p>Conservá este documento como constancia de tu compra.</p></footer>
     </main>
-    <script src="js/factura.js?v=16"></script>
+    <script src="js/factura.js?v=17"></script>
 </body>
 </html>

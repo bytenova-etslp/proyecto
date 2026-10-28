@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS appdb;
+
 USE appdb;
 
 CREATE TABLE Usuario (
@@ -31,23 +33,6 @@ CREATE TABLE Producto_Talle (
     talle VARCHAR(10) NOT NULL,
     stock INT NOT NULL DEFAULT 0,
     PRIMARY KEY (id_producto, talle),
-    FOREIGN KEY (id_producto) REFERENCES Producto(id_producto)
-);
-
-CREATE TABLE Promocion (
-    id_promocion INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    fecha_inicio DATE NOT NULL,
-    fecha_fin DATE NOT NULL,
-    activo TINYINT NOT NULL DEFAULT 1
-);
-
-CREATE TABLE Promocion_Producto (
-    id_promocion INT NOT NULL,
-    id_producto INT NOT NULL,
-    precio_promocional DECIMAL(10,2) NOT NULL,
-    PRIMARY KEY (id_promocion, id_producto),
-    FOREIGN KEY (id_promocion) REFERENCES Promocion(id_promocion),
     FOREIGN KEY (id_producto) REFERENCES Producto(id_producto)
 );
 
@@ -105,30 +90,9 @@ VALUES
 
 INSERT INTO Producto_Talle (id_producto, talle, stock)
 VALUES
-(1, 'S', 2), (1, 'M', 3), (1, 'L', 3), (1, 'XL', 2),
-(2, 'S', 3), (2, 'M', 5), (2, 'L', 4), (2, 'XL', 3),
-(3, 'S', 2), (3, 'M', 3), (3, 'L', 3), (3, 'XL', 2),
-(4, 'S', 3), (4, 'M', 3), (4, 'L', 3), (4, 'XL', 3),
-(5, 'S', 0), (5, 'M', 3), (5, 'L', 3), (5, 'XL', 2),
-(6, 'S', 3), (6, 'M', 4), (6, 'L', 4), (6, 'XL', 3);
-
-INSERT INTO Promocion (id_promocion, nombre, fecha_inicio, fecha_fin)
-VALUES
-(1, 'Promocion de prueba', '2026-10-01', '2026-12-31');
-
-INSERT INTO Promocion_Producto (id_promocion, id_producto, precio_promocional)
-VALUES
-(1, 3, 1590.00),
-(1, 5, 2190.00);
-
--- Completar talles fijos sin modificar existencias previas.
-INSERT INTO Producto_Talle (id_producto, talle, stock)
-SELECT Producto.id_producto, talles.talle, 0
-FROM Producto
-CROSS JOIN (
-    SELECT 'XS' AS talle UNION ALL SELECT 'S' UNION ALL SELECT 'M'
-    UNION ALL SELECT 'L' UNION ALL SELECT 'XL' UNION ALL SELECT 'XXL'
-) AS talles
-LEFT JOIN Producto_Talle AS existente
-    ON existente.id_producto = Producto.id_producto AND existente.talle = talles.talle
-WHERE existente.id_producto IS NULL;
+(1, 'XS', 0), (1, 'S', 2), (1, 'M', 3), (1, 'L', 3), (1, 'XL', 2), (1, 'XXL', 0),
+(2, 'XS', 0), (2, 'S', 3), (2, 'M', 5), (2, 'L', 4), (2, 'XL', 3), (2, 'XXL', 0),
+(3, 'XS', 0), (3, 'S', 2), (3, 'M', 3), (3, 'L', 3), (3, 'XL', 2), (3, 'XXL', 0),
+(4, 'XS', 0), (4, 'S', 3), (4, 'M', 3), (4, 'L', 3), (4, 'XL', 3), (4, 'XXL', 0),
+(5, 'XS', 0), (5, 'S', 0), (5, 'M', 3), (5, 'L', 3), (5, 'XL', 2), (5, 'XXL', 0),
+(6, 'XS', 0), (6, 'S', 3), (6, 'M', 4), (6, 'L', 4), (6, 'XL', 3), (6, 'XXL', 0);
