@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS appdb;
+CREATE DATABASE IF NOT EXISTS puntomoda;
 
-USE appdb;
+USE puntomoda;
 
 CREATE TABLE Usuario (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
