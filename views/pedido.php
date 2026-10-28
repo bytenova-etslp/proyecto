@@ -6,9 +6,10 @@ require __DIR__ . "/header.php";
 ?>
 <main>
     <section class="contenedor-carrito confirmacion-pedido">
-        <h2 class="titulo-seccion">Pedido #<?php echo escapar($pedido["id_pedido"]); ?> registrado</h2>
+        <h2 class="titulo-seccion">Pedido #<?php echo escapar($pedido["id_pedido"]); ?></h2>
+        <?php if ($avisoCancelacion !== ""): ?><p class="aviso-cancelacion" role="status"><?php echo escapar($avisoCancelacion); ?></p><?php endif; ?>
         <p>Fecha: <?php echo escapar($pedido["fecha"]); ?></p>
-        <p>Estado: <strong><?php echo escapar($pedido["estado"]); ?></strong></p>
+        <p>Estado: <strong><?php echo escapar(ucfirst($pedido["estado"])); ?></strong></p>
         <p>Medio de pago: <?php echo escapar($pedido["metodo_pago"] === "tarjeta_ficticia" ? "Tarjeta" : "Por definir"); ?></p>
         <?php require __DIR__ . "/envio_resumen.php"; ?>
         <div class="tabla-pedido-contenedor">
@@ -30,6 +31,10 @@ require __DIR__ . "/header.php";
         </div>
         <p class="total-carrito">Total: $<?php echo escapar(number_format($total, 2, ",", ".")); ?></p>
         <p>Los importes corresponden a los precios vigentes al registrar el pedido.</p>
+        <?php if ($pedido["estado"] === "pagado"): ?>
+            <a class="btn" href="index.php?pagina=factura&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>">Ver factura</a>
+            <a class="btn btn-secundario" href="index.php?pagina=factura_pdf&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>">Descargar PDF</a>
+        <?php endif; ?>
         <?php if (in_array($pedido["estado"], ["pendiente", "rechazado"], true)): ?>
             <a class="btn" href="index.php?pagina=pago&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>"><?php echo $pedido["estado"] === "rechazado" ? "Reintentar pago" : "Pagar con tarjeta"; ?></a>
         <?php endif; ?>
@@ -52,6 +57,7 @@ require __DIR__ . "/header.php";
                 </table>
             </div>
         <?php endif; ?>
+        <?php require __DIR__ . "/cancelar_pedido.php"; ?>
         <a class="btn btn-secundario" href="index.php?pagina=mis_pedidos">Mis pedidos</a>
         <a class="btn" href="index.php?pagina=productos">Seguir comprando</a>
     </section>

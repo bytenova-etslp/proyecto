@@ -1,0 +1,10 @@
+FPDF 1.86, de Olivier Plathey.
+Distribucion PHP mantenida por Setasign:
+https://github.com/Setasign/FPDF/tree/1.8.6
+Commit: 0838e0ee4925716fcbbc50ad9e1799b5edfae0a0
+Documentacion: https://www.fpdf.org/
+
+Se incluyen fpdf.php y las metricas Helvetica regular, negrita y cursiva,
+sin modificaciones. No requiere Composer ni conexiones a Internet al generar.
+La licencia original se conserva en license.txt.
+La logica y el diseno del proyecto estan en views/pdf/FacturaPdf.php.

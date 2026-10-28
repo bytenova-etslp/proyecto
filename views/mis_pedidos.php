@@ -20,10 +20,13 @@ require __DIR__ . "/header.php";
                             <tr>
                                 <td>#<?php echo escapar($pedido["id_pedido"]); ?></td>
                                 <td><?php echo escapar($pedido["fecha"]); ?></td>
-                                <td><?php echo escapar($pedido["estado"]); ?></td>
+                                <td><?php echo escapar(ucfirst($pedido["estado"])); ?></td>
                                 <td>$<?php echo escapar(number_format((float)$pedido["total"], 2, ",", ".")); ?></td>
                                 <td>
                                     <a href="index.php?pagina=pedido&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>">Ver detalle</a>
+                                    <?php if ($pedido["estado"] === "pagado"): ?>
+                                        | <a href="index.php?pagina=factura&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>">Factura</a>
+                                    <?php endif; ?>
                                     <?php if (in_array($pedido["estado"], ["pendiente", "rechazado"], true)): ?>
                                         | <a href="index.php?pagina=pago&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>">Pagar</a>
                                     <?php endif; ?>

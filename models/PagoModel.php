@@ -68,4 +68,46 @@ class PagoModel {
         $consulta->close();
         return $pagos;
     }
+
+    public function obtenerAprobado($idPedido) {
+        $consulta = $this->conexion->prepare("SELECT id_pago, monto, fecha, resultado, ultimos4
+            FROM Pago WHERE id_pedido = ? AND resultado = 'aprobado' ORDER BY id_pago DESC LIMIT 1");
+        $consulta->bind_param("i", $idPedido);
+        $consulta->execute();
+        $pago = $consulta->get_result()->fetch_assoc();
+        $consulta->close();
+        return $pago;
+    }
+
+    // Se filtra por la fecha del cobro/intento, no por la creacion del pedido.
+    // No se une con Detalle_Pedido: sus filas multiplicarian las transacciones.
+    public function resumirPeriodo($inicio, $finExclusivo) {
+        $consulta = $this->conexion->prepare("SELECT COUNT(*) AS intentos,
+            COALESCE(SUM(CASE WHEN resultado = 'aprobado' THEN 1 ELSE 0 END), 0) AS aprobados,
+            COALESCE(SUM(CASE WHEN resultado = 'rechazado' THEN 1 ELSE 0 END), 0) AS rechazados,
+            COALESCE(SUM(CASE WHEN resultado = 'aprobado' THEN monto ELSE 0 END), 0) AS total_cobrado
+            FROM Pago WHERE fecha >= ? AND fecha < ?");
+        $consulta->bind_param("ss", $inicio, $finExclusivo);
+        $consulta->execute();
+        $resumen = $consulta->get_result()->fetch_assoc();
+        $consulta->close();
+        return $resumen;
+    }
+
+    public function listarPeriodo($inicio, $finExclusivo, $limite, $desplazamiento) {
+        $consulta = $this->conexion->prepare("SELECT Pago.id_pago, Pago.id_pedido, Pago.fecha,
+            Pago.resultado, Pago.monto, Pedido.estado AS estado_pedido,
+            Usuario.nombre AS cliente_nombre, Usuario.email AS cliente_email
+            FROM Pago JOIN Pedido ON Pedido.id_pedido = Pago.id_pedido
+            JOIN Usuario ON Usuario.id_usuario = Pedido.id_usuario
+            WHERE Pago.fecha >= ? AND Pago.fecha < ?
+            ORDER BY Pago.fecha DESC, Pago.id_pago DESC LIMIT ? OFFSET ?");
+        $consulta->bind_param("ssii", $inicio, $finExclusivo, $limite, $desplazamiento);
+        $consulta->execute();
+        $resultado = $consulta->get_result();
+        $pagos = [];
+        while ($pago = $resultado->fetch_assoc()) $pagos[] = $pago;
+        $consulta->close();
+        return $pagos;
+    }
 }

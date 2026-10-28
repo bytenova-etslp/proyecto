@@ -5,6 +5,12 @@
 	Estilos compartidos por todas las paginas del sitio.
 */
 
+/* Accion compartida del detalle de pedidos para cliente y personal. */
+.cancelacion-pedido { margin: 24px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #fff; }
+.cancelacion-pedido h2 { margin-bottom: 10px; font-size: 1.1rem; }
+.cancelacion-pedido p { margin: 10px 0 16px; }
+.aviso-cancelacion { margin: 16px 0; padding: 14px; border: 1px solid #cdd5df; border-radius: 6px; background: #eef2f7; }
+
 /* Reinicio general y tipografia */
 * {
 	margin: 0;

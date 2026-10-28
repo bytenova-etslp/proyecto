@@ -6,8 +6,9 @@ require __DIR__ . "/../header.php";
 ?>
 <main class="pedidos-gestion">
     <h1 class="titulo-seccion">Pedido #<?php echo escapar($pedido["id_pedido"]); ?></h1>
+    <?php if ($avisoCancelacion !== ""): ?><p class="aviso-cancelacion" role="status"><?php echo escapar($avisoCancelacion); ?></p><?php endif; ?>
     <p>Fecha: <?php echo escapar($pedido["fecha"]); ?></p>
-    <p>Estado del pago: <span class="estado-pedido" data-estado="<?php echo escapar($pedido["estado"]); ?>"><?php echo escapar(ucfirst($pedido["estado"])); ?></span></p>
+    <p>Estado del pedido: <span class="estado-pedido" data-estado="<?php echo escapar($pedido["estado"]); ?>"><?php echo escapar(ucfirst($pedido["estado"])); ?></span></p>
     <p>Medio de pago: <?php echo escapar($pedido["metodo_pago"] === "tarjeta_ficticia" ? "Tarjeta" : "Por definir"); ?></p>
     <div class="resumen-pedido-gestion">
         <section>
@@ -35,6 +36,13 @@ require __DIR__ . "/../header.php";
         </table>
     </div>
     <p class="total-pedido-gestion">Total: $<?php echo escapar(number_format((float)$pedido["total"], 2, ",", ".")); ?></p>
+    <?php if ($pedido["estado"] === "pagado"): ?>
+        <p class="acciones-admin">
+            <a class="btn" href="index.php?pagina=admin_pedido_factura&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>">Ver factura</a>
+            <a class="btn btn-secundario" href="index.php?pagina=admin_pedido_factura_pdf&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>">Descargar PDF</a>
+        </p>
+    <?php endif; ?>
+    <?php require __DIR__ . "/../cancelar_pedido.php"; ?>
     <p class="acciones-admin"><a class="btn btn-secundario" href="index.php?pagina=admin_pedidos">Volver a pedidos recibidos</a></p>
 </main>
 <?php require __DIR__ . "/../footer.php"; ?>

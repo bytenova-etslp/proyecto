@@ -9,6 +9,8 @@ require_once __DIR__ . "/controllers/AdminProductoController.php";
 require_once __DIR__ . "/controllers/PedidoController.php";
 require_once __DIR__ . "/controllers/AdminPedidoController.php";
 require_once __DIR__ . "/controllers/AdminUsuarioController.php";
+require_once __DIR__ . "/controllers/InformeController.php";
+require_once __DIR__ . "/controllers/FacturaController.php";
 
 // Los cambios de rol o de estado se aplican tambien a sesiones ya abiertas.
 if (estaLogueado()) {
@@ -149,6 +151,61 @@ switch ($paginaSolicitada) {
         } catch (mysqli_sql_exception $error) {
             http_response_code(500);
             $mensajeError = "No se pudieron consultar los pedidos. Intentá nuevamente.";
+            require __DIR__ . "/views/error.php";
+        }
+        break;
+
+    case "cancelar_pedido":
+    case "admin_pedido_cancelar":
+        $esPersonal = $paginaSolicitada === "admin_pedido_cancelar";
+        requerirRol($esPersonal ? ["empleado", "administrador"] : "cliente");
+        if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+            header("Allow: POST");
+            http_response_code(405);
+            $mensajeError = "Método no permitido.";
+            require __DIR__ . "/views/error.php";
+            break;
+        }
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            require_once __DIR__ . "/php/conexion.php";
+            mysqli_set_charset($conexion, "utf8mb4");
+            $controlador = $esPersonal ? new AdminPedidoController($conexion) : new PedidoController($conexion);
+            $controlador->cancelar();
+        } catch (mysqli_sql_exception $error) {
+            http_response_code(500);
+            $mensajeError = "No se pudo cancelar el pedido. Revisá su detalle antes de volver a intentarlo.";
+            require __DIR__ . "/views/error.php";
+        }
+        break;
+
+    case "admin_informe":
+    case "factura":
+    case "factura_pdf":
+    case "admin_pedido_factura":
+    case "admin_pedido_factura_pdf":
+        $esPersonal = in_array($paginaSolicitada, ["admin_informe", "admin_pedido_factura", "admin_pedido_factura_pdf"], true);
+        requerirRol($esPersonal ? ["empleado", "administrador"] : "cliente");
+        if ($_SERVER["REQUEST_METHOD"] !== "GET") {
+            header("Allow: GET");
+            http_response_code(405);
+            $mensajeError = "Método no permitido.";
+            require __DIR__ . "/views/error.php";
+            break;
+        }
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            require_once __DIR__ . "/php/conexion.php";
+            mysqli_set_charset($conexion, "utf8mb4");
+            if ($paginaSolicitada === "admin_informe") {
+                (new InformeController($conexion))->mostrar();
+            } else {
+                $descargar = in_array($paginaSolicitada, ["factura_pdf", "admin_pedido_factura_pdf"], true);
+                (new FacturaController($conexion, $esPersonal))->mostrar($descargar);
+            }
+        } catch (mysqli_sql_exception $error) {
+            http_response_code(500);
+            $mensajeError = "No se pudieron consultar los datos. Intentá nuevamente.";
             require __DIR__ . "/views/error.php";
         }
         break;

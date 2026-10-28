@@ -50,6 +50,26 @@ function esAdmin() {
     return usuarioActualRol() === "administrador";
 }
 
+// Los formularios de cancelacion pertenecen a la sesion que los muestra.
+function tokenCancelacionPedidos() {
+    if (!isset($_SESSION["token_cancelacion_pedidos"])) {
+        $_SESSION["token_cancelacion_pedidos"] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION["token_cancelacion_pedidos"];
+}
+
+function tokenCancelacionValido($valor) {
+    $esperado = $_SESSION["token_cancelacion_pedidos"] ?? null;
+    return is_string($valor) && is_string($esperado) && hash_equals($esperado, $valor);
+}
+
+function avisoCancelacionPedido() {
+    $clave = $_GET["cancelacion"] ?? "";
+    if ($clave === "ok") return "Pedido cancelado. Las unidades fueron devueltas al stock.";
+    if ($clave === "no_disponible") return "El pedido ya no se puede cancelar. Revisá su estado actual.";
+    return "";
+}
+
 function requerirLogin() {
     if (!estaLogueado()) {
         redirigir("login");

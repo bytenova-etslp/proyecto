@@ -120,6 +120,57 @@ class PedidoModel {
         return $pedido;
     }
 
+    // Cancela una reserva sin borrar el pedido. null se usa solo desde el personal.
+    public function cancelar($idPedido, $idUsuario = null) {
+        $this->conexion->begin_transaction();
+        try {
+            // Primero se cambia el estado de forma condicionada. PagoModel tambien
+            // actualiza esta fila antes de cobrar: solo una operacion puede ganar.
+            $sql = "UPDATE Pedido SET estado = 'cancelado'
+                WHERE id_pedido = ? AND estado IN ('pendiente', 'rechazado')";
+            if ($idUsuario !== null) $sql .= " AND id_usuario = ?";
+            $consulta = $this->conexion->prepare($sql);
+            if ($idUsuario === null) $consulta->bind_param("i", $idPedido);
+            else $consulta->bind_param("ii", $idPedido, $idUsuario);
+            $consulta->execute();
+            $actualizados = $consulta->affected_rows;
+            $consulta->close();
+            if ($actualizados !== 1) {
+                $this->conexion->rollback();
+                return false;
+            }
+
+            $consulta = $this->conexion->prepare("SELECT id_producto, talle, cantidad
+                FROM Detalle_Pedido WHERE id_pedido = ? ORDER BY id_producto, talle");
+            $consulta->bind_param("i", $idPedido);
+            $consulta->execute();
+            $resultado = $consulta->get_result();
+            $lineas = [];
+            while ($linea = $resultado->fetch_assoc()) $lineas[] = $linea;
+            $consulta->close();
+
+            foreach ($lineas as $linea) {
+                $cantidad = (int)$linea["cantidad"];
+                if ($cantidad < 1) throw new mysqli_sql_exception("Cantidad de reserva no valida.");
+                $maximoAnterior = 2147483647 - $cantidad;
+                // Suma a las existencias actuales, incluso si se editaron o si el
+                // producto fue dado de baja. El limite impide desbordar el INT.
+                $consulta = $this->conexion->prepare("UPDATE Producto_Talle SET stock = stock + ?
+                    WHERE id_producto = ? AND talle = ? AND stock <= ?");
+                $consulta->bind_param("iisi", $cantidad, $linea["id_producto"], $linea["talle"], $maximoAnterior);
+                $consulta->execute();
+                $devueltos = $consulta->affected_rows;
+                $consulta->close();
+                if ($devueltos !== 1) throw new mysqli_sql_exception("No se pudo devolver una reserva.");
+            }
+            $this->conexion->commit();
+            return true;
+        } catch (Throwable $error) {
+            $this->conexion->rollback();
+            throw $error;
+        }
+    }
+
     public function listarDelCliente($idUsuario) {
         $consulta = $this->conexion->prepare("SELECT Pedido.id_pedido, Pedido.fecha, Pedido.estado,
             COALESCE((SELECT SUM(cantidad * precio_unitario) FROM Detalle_Pedido
@@ -160,6 +211,17 @@ class PedidoModel {
     public function obtenerParaGestion($idPedido) {
         $consulta = $this->conexion->prepare($this->sqlParaGestion() . " WHERE Pedido.id_pedido = ?");
         $consulta->bind_param("i", $idPedido);
+        $consulta->execute();
+        $pedido = $consulta->get_result()->fetch_assoc();
+        $consulta->close();
+        return $pedido;
+    }
+
+    // La factura del cliente necesita su nombre y correo, manteniendo el filtro de dueno.
+    public function obtenerFacturaDelCliente($idPedido, $idUsuario) {
+        $consulta = $this->conexion->prepare($this->sqlParaGestion()
+            . " WHERE Pedido.id_pedido = ? AND Pedido.id_usuario = ?");
+        $consulta->bind_param("ii", $idPedido, $idUsuario);
         $consulta->execute();
         $pedido = $consulta->get_result()->fetch_assoc();
         $consulta->close();

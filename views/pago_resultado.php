@@ -9,6 +9,8 @@ require __DIR__ . "/header.php";
         <?php if ($pedido["estado"] === "pagado"): ?>
             <h2 class="titulo-seccion">Pago aprobado</h2>
             <p>Tu pedido #<?php echo escapar($pedido["id_pedido"]); ?> está pagado. Gracias por tu compra.</p>
+            <a class="btn" href="index.php?pagina=factura&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>">Ver factura</a>
+            <a class="btn btn-secundario" href="index.php?pagina=factura_pdf&amp;id=<?php echo escapar($pedido["id_pedido"]); ?>">Descargar PDF</a>
         <?php else: ?>
             <h2 class="titulo-seccion">Pago rechazado</h2>
             <p>No pudimos procesar el pago del pedido #<?php echo escapar($pedido["id_pedido"]); ?>. Revisá los datos y volvé a intentarlo.</p>

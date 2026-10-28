@@ -128,7 +128,27 @@ class PedidoController {
         $detalle = $this->modelo->obtenerDetalle($pedido["id_pedido"]);
         $total = $this->calcularTotal($detalle);
         $pagos = $this->pagoModel->listarDelPedido($pedido["id_pedido"]);
+        $tokenCancelacion = tokenCancelacionPedidos();
+        $urlCancelar = "index.php?pagina=cancelar_pedido&id=" . (int)$pedido["id_pedido"];
+        $avisoCancelacion = avisoCancelacionPedido();
         require __DIR__ . "/../views/pedido.php";
+    }
+
+    public function cancelar() {
+        requerirRol("cliente");
+        if ($_SERVER["REQUEST_METHOD"] !== "POST" || !tokenCancelacionValido($_POST["token"] ?? null)) {
+            $esPost = $_SERVER["REQUEST_METHOD"] === "POST";
+            if (!$esPost) header("Allow: POST");
+            http_response_code($esPost ? 403 : 405);
+            $mensajeError = $esPost ? "El formulario no es válido. Volvé al detalle del pedido e intentá nuevamente." : "Método no permitido.";
+            require __DIR__ . "/../views/error.php";
+            return;
+        }
+        $pedido = $this->obtenerPedidoDelCliente();
+        if (!$pedido) return;
+        $cancelado = $this->modelo->cancelar((int)$pedido["id_pedido"], usuarioActualId());
+        redirigir("pedido", "&id=" . (int)$pedido["id_pedido"]
+            . "&cancelacion=" . ($cancelado ? "ok" : "no_disponible"));
     }
 
     public function misPedidos() {
@@ -141,7 +161,7 @@ class PedidoController {
         $pedido = $this->obtenerPedidoDelCliente();
         if (!$pedido) return;
         if ($pedido["estado"] === "pagado") {
-            redirigir("pago_resultado", "&id=" . (int)$pedido["id_pedido"]);
+            redirigir("factura", "&id=" . (int)$pedido["id_pedido"]);
         }
         if (!in_array($pedido["estado"], ["pendiente", "rechazado"], true)) {
             http_response_code(409);
@@ -165,7 +185,7 @@ class PedidoController {
                     (int)$pedido["id_pedido"], usuarioActualId(), substr($numero, -4), $resultado
                 );
                 if ($registrado) {
-                    redirigir("pago_resultado", "&id=" . (int)$pedido["id_pedido"]);
+                    redirigir($resultado === "aprobado" ? "factura" : "pago_resultado", "&id=" . (int)$pedido["id_pedido"]);
                 }
                 // Otro envio pudo haber pagado el pedido mientras se completaba el formulario.
                 redirigir("pedido", "&id=" . (int)$pedido["id_pedido"]);
@@ -179,6 +199,9 @@ class PedidoController {
         if (!$pedido) return;
         if ($pedido["estado"] === "pendiente") {
             redirigir("pago", "&id=" . (int)$pedido["id_pedido"]);
+        }
+        if (!in_array($pedido["estado"], ["pagado", "rechazado"], true)) {
+            redirigir("pedido", "&id=" . (int)$pedido["id_pedido"]);
         }
         $total = $this->calcularTotal($this->modelo->obtenerDetalle($pedido["id_pedido"]));
         require __DIR__ . "/../views/pago_resultado.php";

@@ -9,7 +9,7 @@ require __DIR__ . "/../header.php";
     <p>Consultá los pedidos de los clientes y sus datos de envío.</p>
     <form class="filtros-pedidos" action="index.php" method="get">
         <input type="hidden" name="pagina" value="admin_pedidos">
-        <label for="estado-pedidos">Estado del pago</label>
+        <label for="estado-pedidos">Estado del pedido</label>
         <select id="estado-pedidos" name="estado">
             <option value="">Todos</option>
             <?php foreach ($estados as $estado): ?>
@@ -26,7 +26,7 @@ require __DIR__ . "/../header.php";
         <div class="contenedor-tabla">
             <table class="tabla">
                 <caption>Pedidos de todos los clientes</caption>
-                <thead><tr><th>Pedido</th><th>Fecha</th><th>Cliente</th><th>Correo electrónico</th><th>Estado del pago</th><th>Total</th><th>Envío y contacto</th><th>Detalle</th></tr></thead>
+                <thead><tr><th>Pedido</th><th>Fecha</th><th>Cliente</th><th>Correo electrónico</th><th>Estado del pedido</th><th>Total</th><th>Envío y contacto</th><th>Detalle</th></tr></thead>
                 <tbody>
                     <?php foreach ($pedidos as $pedido): ?>
                         <tr>

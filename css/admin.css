@@ -95,6 +95,16 @@
 .acciones-usuario .btn { padding: 10px 14px; white-space: nowrap; }
 .aviso-exito { background: #e4f4e9; border-color: #a4cfb2; color: #22633b; }
 .aviso-error { background: #fff0f2; border-color: #e3adb8; color: #9f1732; }
+.informe-transacciones > p, .informe-transacciones > h2 { margin: 18px 0; }
+.filtros-informe { display: flex; flex-wrap: wrap; align-items: end; gap: 16px; margin: 24px 0; padding: 20px; background: #fff; border: 1px solid #ddd; border-radius: 8px; }
+.filtros-informe > div { display: grid; gap: 6px; }
+.filtros-informe input { padding: 10px; border: 1px solid #bbb; border-radius: 5px; font: inherit; }
+.informe-transacciones .tarjeta h2 { font-size: 1rem; }
+.informe-transacciones .tarjeta p { font-size: 1.65rem; overflow-wrap: anywhere; }
+.informe-transacciones .tarjeta small { display: block; margin-top: 6px; }
+.informe-transacciones .tabla caption { text-align: left; padding: 12px 0; }
+.informe-transacciones .tabla td { vertical-align: top; }
+.paginacion-informe { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin: 24px 0; }
 .importe-pedido { white-space: nowrap; }
 .envio-pedido { min-width: 210px; max-width: 320px; }
 .pedidos-gestion address {
@@ -114,6 +124,7 @@
 .estado-pedido[data-estado="pagado"] { background: #e4f4e9; color: #22633b; }
 .estado-pedido[data-estado="rechazado"] { background: #fff0f2; color: #9f1732; }
 .estado-pedido[data-estado="pendiente"] { background: #fff3d6; color: #77530c; }
+.estado-pedido[data-estado="cancelado"] { background: #e8e9ed; color: #505461; }
 .resumen-pedido-gestion {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
